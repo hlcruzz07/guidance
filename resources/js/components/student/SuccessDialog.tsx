@@ -1,4 +1,4 @@
-import { CheckCircle2, HomeIcon } from 'lucide-react';
+import { CheckCheckIcon, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 
@@ -12,7 +12,7 @@ interface SuccessDialogProps {
 export function SuccessDialog({
     open,
     message = 'Your information has been submitted successfully.',
-    confirmLabel = 'Return to Home',
+    confirmLabel = 'Confirm',
     onConfirm,
 }: SuccessDialogProps) {
     return (
@@ -44,7 +44,7 @@ export function SuccessDialog({
 
                 <DialogFooter className="sm:justify-center">
                     <Button onClick={onConfirm} className="w-full sm:w-auto">
-                        {confirmLabel} <HomeIcon />
+                        <CheckCheckIcon /> {confirmLabel}
                     </Button>
                 </DialogFooter>
             </DialogContent>

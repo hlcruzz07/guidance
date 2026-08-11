@@ -1,12 +1,13 @@
 import { usePage } from '@inertiajs/react';
-
 import { useForm } from '@inertiajs/react';
 import { AlertCircleIcon, LogInIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { SubmittingDialog } from '@/components/student/SubmittingDialog';
+import { SuccessDialog } from '@/components/student/SuccessDialog';
 import ThemeButton from '@/components/ThemeButton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+
 import { Button } from '@/components/ui/button';
 import {
     Field,
@@ -44,6 +45,7 @@ const CAMPUSES = ['Talisay', 'Fortune Towne', 'Alijis', 'Binalbagan'];
 
 export default function Welcome() {
     const flash: FlashMessages = usePage().props.flash || {};
+    const { success } = usePage().props;
 
     const { data, setData, errors, processing, get } = useForm<ValidateForm>({
         id_number: '',
@@ -97,6 +99,10 @@ export default function Welcome() {
 
     return (
         <div className="relative flex min-h-screen flex-col bg-background lg:flex-row">
+            <SuccessDialog
+                open={!!success}
+                onConfirm={() => location.reload()}
+            />
             <SubmittingDialog
                 open={processing}
                 title="Validating Student Information"

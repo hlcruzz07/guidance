@@ -223,7 +223,7 @@ class StudentController extends Controller
                 UploadFileToGoogleDriveJob::dispatch($uploads, $campus);
             }
 
-            return back()->with('success', 'Your information has been submitted successfully.');
+            return Inertia::render('welcome', ['success' => true]);
         } catch (\Throwable $th) {
             Log::error('Student SII submission failed', [
                 'message' => $th->getMessage(),
