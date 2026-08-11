@@ -14,7 +14,10 @@ import {
     WeightIcon,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import Heading from '@/components/heading';
+import { toast } from 'sonner';
+import SignatureModal from '@/components/student/SignaturePad';
+import { SubmittingDialog } from '@/components/student/SubmittingDialog';
+import { SuccessDialog } from '@/components/student/SuccessDialog';
 import ThemeButton from '@/components/ThemeButton';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -28,15 +31,12 @@ import {
 } from '@/components/ui/command';
 import {
     Field,
-    FieldContent,
     FieldDescription,
     FieldError,
     FieldGroup,
     FieldLabel,
     FieldLegend,
-    FieldSeparator,
     FieldSet,
-    FieldTitle,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -52,7 +52,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { Spinner } from '@/components/ui/spinner';
 import {
     Table,
     TableBody,
@@ -72,6 +72,7 @@ import {
     fetchNationalities,
     handleErrors,
 } from '@/lib/utils';
+import { storeStudent } from '@/routes';
 
 import type {
     EquityGroup,
@@ -80,7 +81,6 @@ import type {
     Student,
     StudentRecord,
 } from '@/types/entities';
-import { Education } from '@/types/entities';
 
 type StudentForm = Omit<
     Student,
@@ -226,13 +226,6 @@ type ConcernAnswerState = {
     answer: 'Yes' | 'No' | '';
     subAnswer: string;
 };
-import { Spinner } from '@/components/ui/spinner';
-import { ca } from 'date-fns/locale';
-import { toast } from 'sonner';
-import { storeStudent } from '@/routes';
-import { SubmittingDialog } from '@/components/student/SubmittingDialog';
-import { SuccessDialog } from '@/components/student/SuccessDialog';
-import SignatureModal from '@/components/student/SignaturePad';
 
 export default function Index() {
     const { student } = usePage<PageProps>().props;
@@ -339,13 +332,14 @@ export default function Index() {
     });
 
     // Data Privacy Consent state
+    const [signatureModalOpen, setSignatureModalOpen] = useState(false);
     const [dataPrivacyConsent, setDataPrivacyConsent] = useState(false);
     useEffect(() => {
         if (!dataPrivacyConsent) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setSignatureModalOpen(false);
         }
     }, [dataPrivacyConsent]);
-    const [signatureModalOpen, setSignatureModalOpen] = useState(false);
     // Educational Background state
     const [educationEntries, setEducationEntries] = useState<
         Record<EducationLevel, EducationEntry>
@@ -400,7 +394,7 @@ export default function Index() {
 
         return entries;
     });
-    const [includeGuardian, setIncludeGuardian] = useState(false);
+    const [includeGuardian] = useState(false);
 
     const visibleGuardianTypes = useMemo(() => {
         return GUARDIAN_TYPES_ORDER.filter((relationship) => {
@@ -597,6 +591,7 @@ export default function Index() {
                     student.person_notify_cellphone?.toString() ?? '',
             }));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Keep data.educations in sync with the visible rows only
@@ -605,6 +600,7 @@ export default function Index() {
             (education_level) => educationEntries[education_level],
         );
         setData('educations', list as any[]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [educationEntries, visibleEducationLevels]);
 
     // Keep data.guardians in sync with the visible guardian entries only
@@ -613,11 +609,13 @@ export default function Index() {
             (relationship) => guardianEntries[relationship],
         );
         setData('guardians', list as any[]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [guardianEntries, visibleGuardianTypes]);
 
     // Keep data.siblings in sync with the siblings list
     useEffect(() => {
         setData('siblings', siblings as any[]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [siblings]);
 
     // Keep data.equity_groups in sync with the selected equity groups
@@ -632,11 +630,13 @@ export default function Index() {
             proof: entry.proof as any,
         }));
         setData('equity_groups', list as any[]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [equityGroupEntries]);
 
     // Keep data.psych_tests in sync with the psych tests list
     useEffect(() => {
         setData('psych_tests', psychTests as Partial<PsychTest>[] as any[]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [psychTests]);
 
     // Keep data.concerns in sync with the concerns answers
@@ -654,6 +654,7 @@ export default function Index() {
             };
         });
         setData('concerns', list as any[]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [concernAnswers]);
 
     // if (!student) {

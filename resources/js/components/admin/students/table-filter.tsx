@@ -20,7 +20,6 @@ import { useEffect, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 import DropdownFilter from '@/components/dropdown-filter';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
     DropdownMenu,
@@ -70,6 +69,7 @@ export default function TableFilter({
         }, 500);
 
         return () => clearTimeout(timeout);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchVal]);
 
     const resetFilter = () => {
@@ -378,8 +378,8 @@ export default function TableFilter({
                             setSections([]);
 
                             if (value) {
-getCourses(value);
-}
+                                getCourses(value);
+                            }
                         }}
                         icon={School2}
                     />
@@ -398,8 +398,8 @@ getCourses(value);
                             setSections([]);
 
                             if (data.campus && value) {
-getYearLevels(data.campus, value);
-}
+                                getYearLevels(data.campus, value);
+                            }
                         }}
                         icon={GraduationCap}
                     />
@@ -466,8 +466,8 @@ getYearLevels(data.campus, value);
                                 classNames={{ today: '' }}
                                 onSelect={(newRange) => {
                                     if (!newRange) {
-return;
-}
+                                        return;
+                                    }
 
                                     setRange(newRange);
 

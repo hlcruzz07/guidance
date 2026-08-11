@@ -4,19 +4,14 @@ import {
     ArrowDownNarrowWide,
     ArrowUpNarrowWide,
     ArrowUpDownIcon,
-    CalendarIcon,
     ChevronDownIcon,
-    MailCheckIcon,
     RefreshCwIcon,
     SearchIcon,
-    ShieldIcon,
-    SlidersHorizontalIcon,
     XIcon,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -85,6 +80,7 @@ export default function AccountFilter({
         }, 500);
 
         return () => clearTimeout(timeout);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchVal]);
 
     const resetFilter = () => {

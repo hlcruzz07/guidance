@@ -78,6 +78,7 @@ export default function ActivityLogFilter({
         }, 500);
 
         return () => clearTimeout(timeout);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchVal]);
 
     const resetFilter = () => {
@@ -296,8 +297,8 @@ export default function ActivityLogFilter({
                                 classNames={{ today: '' }}
                                 onSelect={(newRange) => {
                                     if (!newRange) {
-return;
-}
+                                        return;
+                                    }
 
                                     setRange(newRange);
 

@@ -2,7 +2,6 @@
 import { useForm } from '@inertiajs/react';
 import { ClipboardPenIcon, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
-import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,12 +12,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { updateRemarks } from '@/routes';
 import type { Student } from '@/types/entities';
 import { Field, FieldError, FieldLabel } from '../../ui/field';
-import { Input } from '../../ui/input';
 // import { updateStudentRemarks } from '@/routes'; // adjust to your actual route helper
 
 interface StudentRemarksDialogProps {
@@ -48,8 +45,8 @@ export default function StudentRemarksDialog({
 
     const handleSubmit = () => {
         if (!student) {
-return;
-}
+            return;
+        }
 
         put(updateRemarks(student.id!).url, {
             preserveScroll: true,
@@ -67,8 +64,8 @@ return;
             open={open}
             onOpenChange={(next) => {
                 if (processing) {
-return;
-}
+                    return;
+                }
 
                 setOpen(next);
             }}

@@ -1,14 +1,10 @@
-import { tr } from 'date-fns/locale';
 import dayjs from 'dayjs';
 import { CheckIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useDropdowns } from '@/hooks/use-dropdowns';
 import { getSignature } from '@/routes';
 import type { Student } from '@/types/entities';
-import { Field, FieldGroup, FieldLabel } from '../../ui/field';
-import { Label } from '../../ui/label';
 
 type Props = {
     student: Student | null;
@@ -40,8 +36,8 @@ export default function StudentSIIPrintForm({ student }: Props) {
 
     useEffect(() => {
         if (!student || !printRootRef.current) {
-return;
-}
+            return;
+        }
 
         const el = printRootRef.current;
 
@@ -62,11 +58,12 @@ return;
             resizeObserver.disconnect();
             window.removeEventListener('beforeprint', calculatePages);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [student]);
     useEffect(() => {
         if (!student || !page1Ref.current) {
-return;
-}
+            return;
+        }
 
         const el = page1Ref.current;
 
@@ -91,15 +88,17 @@ return;
             resizeObserver.disconnect();
             window.removeEventListener('beforeprint', fit);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [student]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSignatureError(false);
     }, [student]);
 
     if (!student) {
-return null;
-}
+        return null;
+    }
 
     const father = student.guardians?.find((g) => g.relationship === 'Father');
     const mother = student.guardians?.find((g) => g.relationship === 'Mother');
@@ -107,12 +106,12 @@ return null;
     const parentRowCount = 11; // Name, Age, Contact Number, ...
     const siblingRows = [...(student.siblings ?? [])].sort((a, b) => {
         if (!a.birthdate) {
-return 1;
-}
+            return 1;
+        }
 
         if (!b.birthdate) {
-return -1;
-}
+            return -1;
+        }
 
         return dayjs(a.birthdate).diff(dayjs(b.birthdate));
     });

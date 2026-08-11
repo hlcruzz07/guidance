@@ -24,7 +24,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { getSignature, getProof } from '@/routes';
+import { getProof } from '@/routes';
 import type { Student } from '@/types/entities';
 
 type Props = {
@@ -96,8 +96,8 @@ function EmptyState({ label }: { label: string }) {
 // using the getProof Wayfinder route.
 function resolveProofUrl(proof: string | null | undefined): string | null {
     if (!proof) {
-return null;
-}
+        return null;
+    }
 
     return getProof(proof).url;
 }
@@ -157,8 +157,8 @@ export default function StudentDetailsDialog({
     } | null>(null);
 
     if (!student) {
-return null;
-}
+        return null;
+    }
 
     const initials = [student.fname?.[0], student.lname?.[0]]
         .filter(Boolean)

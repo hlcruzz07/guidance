@@ -1,5 +1,5 @@
-import { ClipboardPenIcon, EraserIcon, SaveIcon } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { EraserIcon, SaveIcon } from 'lucide-react';
+import { useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from '@/components/ui/dialog';
 
 interface SignatureModalProps {
@@ -41,8 +40,8 @@ export default function SignatureModal({
                 const ctx = canvas.getContext('2d');
 
                 if (!ctx) {
-return reject('Canvas context error');
-}
+                    return reject('Canvas context error');
+                }
 
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -51,10 +50,10 @@ return reject('Canvas context error');
                 canvas.toBlob(
                     (jpgBlob) => {
                         if (!jpgBlob) {
-reject('Failed to convert to JPEG');
-} else {
-resolve(jpgBlob);
-}
+                            reject('Failed to convert to JPEG');
+                        } else {
+                            resolve(jpgBlob);
+                        }
                     },
                     'image/jpeg',
                     0.95,
@@ -80,8 +79,8 @@ resolve(jpgBlob);
                 const ctx = canvas.getContext('2d');
 
                 if (!ctx) {
-return reject('Canvas error');
-}
+                    return reject('Canvas error');
+                }
 
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, width, height);
@@ -97,10 +96,10 @@ return reject('Canvas error');
                 canvas.toBlob(
                     (outBlob) => {
                         if (!outBlob) {
-reject('Resize failed');
-} else {
-resolve(outBlob);
-}
+                            reject('Resize failed');
+                        } else {
+                            resolve(outBlob);
+                        }
                     },
                     'image/jpeg',
                     0.95,
@@ -113,8 +112,8 @@ resolve(outBlob);
 
     const save = async () => {
         if (!sigCanvas.current) {
-return;
-}
+            return;
+        }
 
         if (!id_number) {
             toast.error('No Student ID Number found');

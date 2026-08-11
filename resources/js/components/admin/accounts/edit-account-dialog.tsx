@@ -1,7 +1,6 @@
 import { useForm } from '@inertiajs/react';
-import { Asterisk, MailIcon, UserIcon, X } from 'lucide-react';
+import { Asterisk, UserIcon, X } from 'lucide-react';
 import { useEffect } from 'react';
-import { toast } from 'sonner';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -51,13 +50,6 @@ export function EditAccountDialog({
     onReload: () => void;
     user: User | null;
 }) {
-    if (!user && open) {
-        toast.error('No selected user found');
-
-        return;
-    }
-
-    console.log(roles);
     const { data, setData, processing, errors, put, clearErrors, reset } =
         useForm<FormData>({
             email: user?.email || '',
@@ -69,12 +61,12 @@ export function EditAccountDialog({
         e.preventDefault();
 
         if (processing) {
-return;
-}
+            return;
+        }
 
         if (!user || !user.id) {
-return;
-}
+            return;
+        }
 
         put(updateAccount(user.id).url, {
             preserveScroll: true,
@@ -92,14 +84,15 @@ return;
 
     useEffect(() => {
         if (!user) {
-return;
-}
+            return;
+        }
 
         setData({
             email: user?.email || '',
             name: user?.name || '',
             role: user?.roles[0]?.name,
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     return (
@@ -147,7 +140,7 @@ return;
                                 value={data.name ?? ''}
                                 aria-invalid={!!errors['name']}
                                 onChange={(e) =>
-                                    setData('email', e.target.value)
+                                    setData('name', e.target.value)
                                 }
 
                                 className="py-2"

@@ -1,13 +1,8 @@
 import { usePage } from '@inertiajs/react';
-
-import { UserIcon } from 'lucide-react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { normalizeName } from '@/lib/utils';
-import { Badge } from './ui/badge';
 
 export default function AppLogo() {
-    const { name } = usePage().props;
-
     return (
         <>
             <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />

@@ -92,6 +92,7 @@ export default function Welcome() {
         }, 100);
 
         return () => clearTimeout(timeoutId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [flash.success, flash.error, flash.info, flash.warning]);
 
     return (

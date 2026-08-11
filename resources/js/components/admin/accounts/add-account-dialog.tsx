@@ -20,7 +20,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { capitalizeString, handleErrors, normalizeName } from '@/lib/utils';
+import { handleErrors, normalizeName } from '@/lib/utils';
 import { createAccount } from '@/routes';
 import { Field, FieldError, FieldLabel } from '../../ui/field';
 
@@ -57,8 +57,8 @@ export function AddAccountDialog({
         e.preventDefault();
 
         if (processing) {
-return;
-}
+            return;
+        }
 
         post(createAccount().url, {
             preserveScroll: true,

@@ -5,7 +5,6 @@ import { UserPenIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import AccountFilter from '@/components/admin/accounts/accounts-table-filter';
-import { AddAccountDialog } from '@/components/admin/accounts/add-account-dialog';
 import { EditAccountDialog } from '@/components/admin/accounts/edit-account-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -76,7 +75,9 @@ export default function Index() {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchAccountsData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter]);
 
     const getInitials = useInitials();
@@ -107,7 +108,7 @@ export default function Index() {
             toast.success('Refreshed!', {
                 id: toastId,
             });
-        } catch (error) {
+        } catch {
             toast.error('Failed to refresh', {
                 id: toastId,
             });
@@ -298,8 +299,8 @@ export default function Index() {
                                                                     e.preventDefault();
 
                                                                     if (!page) {
-return;
-}
+                                                                        return;
+                                                                    }
 
                                                                     try {
                                                                         const {

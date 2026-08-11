@@ -138,7 +138,9 @@ export default function Index() {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchLogsData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter]);
 
     const tableColumns = [
@@ -163,7 +165,7 @@ export default function Index() {
             toast.success('Refreshed!', {
                 id: toastId,
             });
-        } catch (error) {
+        } catch {
             toast.error('Failed to refresh', {
                 id: toastId,
             });
@@ -373,7 +375,7 @@ export default function Index() {
                                 </tr>
                             </thead>
                             <tbody className="lg:border-b">
-                                {logs?.data.map((row, index) => {
+                                {logs?.data.map((row) => {
                                     const ActionIcon =
                                         actionIcons[row.action] ?? Activity;
 
@@ -523,8 +525,8 @@ export default function Index() {
                                                                     e.preventDefault();
 
                                                                     if (!page) {
-return;
-}
+                                                                        return;
+                                                                    }
 
                                                                     try {
                                                                         const {

@@ -8,7 +8,6 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import { toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
 export function NavFooter({

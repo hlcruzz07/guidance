@@ -27,14 +27,17 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useDropdowns } from '@/hooks/use-dropdowns';
 import AppLayout from '@/layouts/app-layout';
 import TableLayout from '@/layouts/table-layout';
 import apiService from '@/lib/api-service';
-import { getSignature, paginateStudents } from '@/routes';
+import { paginateStudents } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 import { defaultStudentFilters } from '@/types/entities';
-import type { StudentFilters, Student , PaginateStudents } from '@/types/entities';
+import type {
+    StudentFilters,
+    Student,
+    PaginateStudents,
+} from '@/types/entities';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -86,19 +89,21 @@ export default function Index() {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchStudentsData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter]);
 
     useEffect(() => {
         if (!printStudent) {
-return;
-}
+            return;
+        }
 
         const printRoot = document.getElementById('print-root');
 
         if (!printRoot) {
-return;
-}
+            return;
+        }
 
         const images = Array.from(printRoot.querySelectorAll('img'));
 
@@ -154,7 +159,7 @@ return;
             toast.success('Refreshed!', {
                 id: toastId,
             });
-        } catch (error) {
+        } catch {
             toast.error('Failed to refresh', {
                 id: toastId,
             });
@@ -541,8 +546,8 @@ return;
                                                                     e.preventDefault();
 
                                                                     if (!page) {
-return;
-}
+                                                                        return;
+                                                                    }
 
                                                                     try {
                                                                         const {
