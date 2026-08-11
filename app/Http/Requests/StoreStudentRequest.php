@@ -14,24 +14,8 @@ class StoreStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // ================================================================
-            // I. Personal Information
-            // Order below mirrors the on-page order in Index.tsx (top -> bottom)
-            // so that handleErrors()'s "scroll to first error" behavior lands
-            // on the field the student actually sees first.
-            // ================================================================
-
-            // Identity fields (feed the disabled "Full name" / "Course & Section"
-            // displays at the very top of the form)
             'id_number' => ['required', 'string', 'max:50'],
-
-            'e_signature' => [
-                'required',
-
-
-
-            ],
-
+            'e_signature' => ['required'],
             'campus' => ['required', 'string', 'max:100'],
             'fname' => ['required', 'string', 'max:100'],
             'mname' => ['nullable', 'string', 'max:100'],
@@ -166,31 +150,12 @@ class StoreStudentRequest extends FormRequest
             'siblings.*.birthdate' => ['required', 'date'],
             'siblings.*.gender' => ['required', 'string', 'in:Male,Female'],
             'siblings.*.is_employed' => ['nullable', 'boolean'],
+
+            // ---- IV. Equity Target Group Affiliation ----
+            // Proof is now required whenever a group entry exists.
             'equity_groups' => ['nullable', 'array'],
             'equity_groups.*.equity_group' => ['required', 'string', 'max:150'],
-            'equity_groups.*.proof' => [
-                'required',
-                'file',
-                'max:5120',
-                function ($attribute, $value, $fail) {
-                    $ext = strtolower($value->getClientOriginalExtension());
-                    if (!in_array($ext, ['jpg', 'jpeg', 'png'], true)) {
-                        $fail('The proof file must be a JPG, JPEG, or PNG.');
-                        return;
-                    }
-
-                    $imageInfo = @getimagesize($value->getRealPath());
-                    if ($imageInfo === false) {
-                        $fail('The proof file must be a valid image.');
-                        return;
-                    }
-
-                    $allowedMimes = ['image/jpeg', 'image/png'];
-                    if (!in_array($imageInfo['mime'], $allowedMimes, true)) {
-                        $fail('The proof file must be a JPG, JPEG, or PNG.');
-                    }
-                },
-            ],
+            'equity_groups.*.proof' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
 
             // ---- V. Psychological Test Records ----
             // Capped to fit the table-fixed layout's hard column widths
@@ -469,6 +434,7 @@ class StoreStudentRequest extends FormRequest
 
             'equity_groups.*.proof.required' => 'Please upload a supporting document or proof for the equity group(s) you selected.',
             'equity_groups.*.proof.file' => 'The uploaded proof must be a valid file.',
+            'equity_groups.*.proof.mimes' => 'The proof file must be a JPG,JPEG, or PNG.',
             'equity_groups.*.proof.max' => 'The proof file must not be larger than 5MB.',
 
             // ================================================================

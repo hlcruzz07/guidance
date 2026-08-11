@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreStudentRequest;
 use App\Jobs\UploadFileToGoogleDriveJob;
-use App\Models\EquityGroup;
+use App\Models\EntityDropdown;
 use App\Models\Student;
-use App\Repositories\StudentRepo;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreStudentRequest;
+use App\Models\EquityGroup;
+use App\Repositories\StudentRepo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -16,8 +17,8 @@ class StudentController extends Controller
 {
     public function __construct(protected StudentRepo $studentRepo)
     {
-    }
 
+    }
     public function index()
     {
         $stats = [
@@ -31,7 +32,6 @@ class StudentController extends Controller
             'stats' => $stats,
         ]);
     }
-
     public function form(Request $request)
     {
         $data = $request->validate([
@@ -53,7 +53,7 @@ class StudentController extends Controller
             };
 
             if (!$connection) {
-                return redirect()->route('home')->with('error', 'Invalid selected campus.');
+                return redirect()->route('home')->with('error', 'Database connection error. Please try again later.');
             }
 
             // Step 1: check if the student exists at all (id + birthdate match)
@@ -134,28 +134,7 @@ class StudentController extends Controller
             $signatureFile = $data['e_signature'] ?? null;
             unset($data['e_signature']);
 
-            // NOTE ON FILE STORAGE:
-            // Laravel's Storage/Flysystem local disk adapter requires the
-            // `fileinfo` PHP extension just to construct itself
-            // (League\Flysystem\Local\LocalFilesystemAdapter builds a
-            // FinfoMimeTypeDetector in its constructor), independent of which
-            // storage method is called. Since fileinfo is not installed on
-            // this host, ANY Storage::disk()/->store()/->storeAs() call on a
-            // local disk will fail with "Class finfo not found".
-            //
-            // Workaround: use Symfony's native UploadedFile::move(), which
-            // calls PHP's move_uploaded_file()/rename() directly and never
-            // touches Flysystem or fileinfo. This bypasses the Storage facade
-            // entirely for these temp uploads.
-            //
-            // The real fix is enabling the fileinfo extension on the server —
-            // this is a workaround until that's done.
-            $tempDir = storage_path('app/private/temp');
-            if (!is_dir($tempDir)) {
-                mkdir($tempDir, 0755, true);
-            }
-
-            DB::transaction(function () use ($data, $signatureFile, $tempDir, &$uploads, &$campus) {
+            DB::transaction(function () use ($data, $signatureFile, &$uploads, &$campus) {
 
                 $student = $this->studentRepo->updateOrCreate($data);
 
@@ -186,34 +165,26 @@ class StudentController extends Controller
                             'proof' => null,
                         ]);
 
-                        $proofFile = $group['proof'];
-                        $extension = strtolower($proofFile->getClientOriginalExtension()) ?: 'jpg';
-                        $tempFilename = uniqid('proof_', true) . '.' . $extension;
-
-                        // move() = Symfony's native move, bypasses Flysystem/finfo.
-                        $movedFile = $proofFile->move($tempDir, $tempFilename);
+                        $tempPath = $group['proof']->store('temp');
 
                         $uploads[] = [
                             'model' => EquityGroup::class,
                             'id' => $equityGroup->id,
                             'field' => 'proof',
-                            'path' => $movedFile->getPathname(),
-                            'filename' => $proofFile->getClientOriginalName(),
+                            'path' => storage_path("app/private/{$tempPath}"),
+                            'filename' => $group['proof']->getClientOriginalName(),
                         ];
                     }
                 }
 
                 if ($signatureFile) {
-                    $sigExtension = strtolower($signatureFile->getClientOriginalExtension()) ?: 'png';
-                    $sigFilename = uniqid('signature_', true) . '.' . $sigExtension;
-
-                    $movedSignature = $signatureFile->move($tempDir, $sigFilename);
+                    $tempPath = $signatureFile->store('temp');
 
                     $uploads[] = [
                         'model' => Student::class,
                         'id' => $student->id,
                         'field' => 'e_signature',
-                        'path' => $movedSignature->getPathname(),
+                        'path' => storage_path("app/private/{$tempPath}"),
                         'filename' => $signatureFile->getClientOriginalName(),
                     ];
                 }
@@ -233,6 +204,7 @@ class StudentController extends Controller
             return back()->with('error', 'Something went wrong. Please try again later.');
         }
     }
+
     public function updateRemarks(string $id, Request $request)
     {
         $data = $request->validate([
@@ -244,6 +216,7 @@ class StudentController extends Controller
 
         return back()->with('success', 'Remarks updated successfully');
     }
+
 
     /**
      * Display the specified resource.
