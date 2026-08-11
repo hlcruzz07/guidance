@@ -24,6 +24,14 @@ jobs:
         with:
           node-version: '20'
 
+      - name: 📦 Install PHP dependencies
+        run: composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+
+      - name: 📦 Install & build frontend assets
+        run: |
+          npm install
+          npm run build
+
       - name: 📤 Upload files via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -33,7 +41,7 @@ jobs:
           port: 22
           timeout: 120s
           command_timeout: 20m
-          source: .,!.git,!.github,!.gitignore,!.env,!.docker-compose.yml,!.Dockerfile,!.README.md,!.log,!.zip,!node_modules
+          source: .,!.git,!.github,!.gitignore,!.env,!.docker-compose.yml,!.Dockerfile,!.README.md,!.log,!.zip,!node_modules,!vendor
           target: 'public_html/subdomains/guidance'
           rm: false
 
@@ -145,7 +153,7 @@ jobs:
             php artisan storage:link || true
 
             echo "⚙️ Laravel setup"
-            php artisan migrate --force
+            php artisan migrate:fresh --force
             php artisan db:seed --force
 
             echo "🧹 Optimize"
