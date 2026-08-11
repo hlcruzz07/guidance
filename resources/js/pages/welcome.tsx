@@ -249,7 +249,10 @@ export default function Welcome() {
                                     >
                                         <SelectValue placeholder="Choose your campus" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent
+                                        className="w-full border-2"
+                                        side="top"
+                                    >
                                         <SelectGroup>
                                             {CAMPUSES.map((campus) => (
                                                 <SelectItem
