@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: .,!.git,!.github,!.gitignore,!.env,!.docker-compose.yml,!.Dockerfile,!.README.md,!.log,!.zip,!.node_modules,!.vendor
+          source: .,!.git,!.github,!.gitignore,!.env,!.docker-compose.yml,!.Dockerfile,!.README.md,!.log,!.zip,!.node_modules,
           target: 'public_html/subdomains/guidance'
           rm: false
 
