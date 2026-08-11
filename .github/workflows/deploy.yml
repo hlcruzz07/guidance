@@ -28,7 +28,10 @@ jobs:
           npm install
           npm run build
 
-      - name: 📤 Upload files via SCP
+      - name: � Install PHP dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: �📤 Upload files via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -37,7 +40,7 @@ jobs:
           port: 22
           timeout: 120s
           command_timeout: 20m
-          source: .,!.git,!.github,!.gitignore,!.env,!.docker-compose.yml,!.Dockerfile,!.README.md,!.log,!.zip,!node_modules,!vendor
+          source: .,!.git,!.github,!.gitignore,!.env,!.docker-compose.yml,!.Dockerfile,!.README.md,!.log,!.zip,!node_modules
           target: 'public_html/subdomains/guidance'
           rm: false
 
@@ -146,7 +149,8 @@ jobs:
             EOF
 
             echo "📦 Composer install"
-            composer install --no-dev --optimize-autoloader
+            # vendor/ is uploaded via SCP; just dump the autoloader
+            composer dump-autoload --no-dev --optimize 2>/dev/null || true
 
             echo "🔗 Storage link"
             php artisan storage:link || true

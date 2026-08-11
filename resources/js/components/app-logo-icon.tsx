@@ -1,3 +1,3 @@
-export default function AppLogoIcon() {
-    return <img src="/logo.webp" className="h-8 w-8" />;
+export default function AppLogoIcon({ className }: { className?: string }) {
+    return <img src="/logo.webp" className={className ?? 'h-8 w-8'} />;
 }
