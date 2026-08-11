@@ -230,6 +230,35 @@ type ConcernAnswerState = {
 export default function Index() {
     const { student } = usePage<PageProps>().props;
 
+    const flash: any = usePage().props.flash || {};
+
+    useEffect(() => {
+        if (!flash) {
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            if (flash.success) {
+                toast.success(flash.success);
+            }
+
+            if (flash.error) {
+                toast.error(flash.error);
+            }
+
+            if (flash.info) {
+                toast.info(flash.info);
+            }
+
+            if (flash.warning) {
+                toast.warning(flash.warning);
+            }
+        }, 100);
+
+        return () => clearTimeout(timeoutId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [flash.success, flash.error, flash.info, flash.warning]);
+
     const {
         studentTypes,
         sexualOrientations,

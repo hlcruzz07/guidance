@@ -134,7 +134,28 @@ class StudentController extends Controller
             $signatureFile = $data['e_signature'] ?? null;
             unset($data['e_signature']);
 
-            DB::transaction(function () use ($data, $signatureFile, &$uploads, &$campus) {
+            // NOTE ON FILE STORAGE:
+            // Laravel's Storage/Flysystem local disk adapter requires the
+            // `fileinfo` PHP extension just to construct itself
+            // (League\Flysystem\Local\LocalFilesystemAdapter builds a
+            // FinfoMimeTypeDetector in its constructor), independent of which
+            // storage method is called. Since fileinfo is not installed on
+            // this host, ANY Storage::disk()/->store()/->storeAs() call on a
+            // local disk will fail with "Class finfo not found".
+            //
+            // Workaround: use Symfony's native UploadedFile::move(), which
+            // calls PHP's move_uploaded_file()/rename() directly and never
+            // touches Flysystem or fileinfo. This bypasses the Storage facade
+            // entirely for these temp uploads.
+            //
+            // The real fix is enabling the fileinfo extension on the server —
+            // this is a workaround until that's done.
+            $tempDir = storage_path('app/private/temp');
+            if (!is_dir($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            DB::transaction(function () use ($data, $signatureFile, $tempDir, &$uploads, &$campus) {
 
                 $student = $this->studentRepo->updateOrCreate($data);
 
@@ -165,20 +186,18 @@ class StudentController extends Controller
                             'proof' => null,
                         ]);
 
-                        // storeAs() with an explicit filename avoids Laravel's
-                        // hashName() -> Symfony MIME guesser -> fileinfo path
-                        // entirely. getClientOriginalExtension() just reads the
-                        // filename suffix from the upload, no content sniffing.
                         $proofFile = $group['proof'];
                         $extension = strtolower($proofFile->getClientOriginalExtension()) ?: 'jpg';
                         $tempFilename = uniqid('proof_', true) . '.' . $extension;
-                        $tempPath = $proofFile->storeAs('temp', $tempFilename);
+
+                        // move() = Symfony's native move, bypasses Flysystem/finfo.
+                        $movedFile = $proofFile->move($tempDir, $tempFilename);
 
                         $uploads[] = [
                             'model' => EquityGroup::class,
                             'id' => $equityGroup->id,
                             'field' => 'proof',
-                            'path' => storage_path("app/private/{$tempPath}"),
+                            'path' => $movedFile->getPathname(),
                             'filename' => $proofFile->getClientOriginalName(),
                         ];
                     }
@@ -187,13 +206,14 @@ class StudentController extends Controller
                 if ($signatureFile) {
                     $sigExtension = strtolower($signatureFile->getClientOriginalExtension()) ?: 'png';
                     $sigFilename = uniqid('signature_', true) . '.' . $sigExtension;
-                    $tempPath = $signatureFile->storeAs('temp', $sigFilename);
+
+                    $movedSignature = $signatureFile->move($tempDir, $sigFilename);
 
                     $uploads[] = [
                         'model' => Student::class,
                         'id' => $student->id,
                         'field' => 'e_signature',
-                        'path' => storage_path("app/private/{$tempPath}"),
+                        'path' => $movedSignature->getPathname(),
                         'filename' => $signatureFile->getClientOriginalName(),
                     ];
                 }
@@ -203,7 +223,7 @@ class StudentController extends Controller
                 UploadFileToGoogleDriveJob::dispatch($uploads, $campus);
             }
 
-            return redirect()->route('home')->with('success', 'Your information has been submitted successfully.');
+            return back()->with('success', 'Your information has been submitted successfully.');
         } catch (\Throwable $th) {
             Log::error('Student SII submission failed', [
                 'message' => $th->getMessage(),
