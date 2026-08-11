@@ -5,8 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -34,7 +33,7 @@ return new class extends Migration
             $table->string('weight')->nullable();
             $table->string('religion');
             $table->date('date_of_birth');
-            $table->string('place_of_birth');
+            $table->string('place_of_birth')->nullable();
             $table->string('nationality')->nullable();
             $table->string('last_school_attended')->nullable();
             $table->string('general_average')->nullable();
