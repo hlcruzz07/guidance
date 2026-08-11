@@ -23,10 +23,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: 📦 Install PHP dependencies
-        run: composer install --no-dev --optimize-autoloader --ignore-platform-reqs
-
       - name: 📦 Install & build frontend assets
         run: |
           npm install
@@ -148,6 +144,9 @@ jobs:
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
             EOF
+
+            echo "📦 Composer install"
+            composer install --no-dev --optimize-autoloader
 
             echo "🔗 Storage link"
             php artisan storage:link || true
