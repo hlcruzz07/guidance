@@ -164,7 +164,29 @@ class StoreStudentRequest extends FormRequest
             // Proof is now required whenever a group entry exists.
             'equity_groups' => ['nullable', 'array'],
             'equity_groups.*.equity_group' => ['required', 'string', 'max:150'],
-            'equity_groups.*.proof' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'equity_groups.*.proof' => [
+                'required',
+                'file',
+                'max:5120',
+                function ($attribute, $value, $fail) {
+                    $ext = strtolower($value->getClientOriginalExtension());
+                    if (!in_array($ext, ['jpg', 'jpeg', 'png'], true)) {
+                        $fail('The proof file must be a JPG, JPEG, or PNG.');
+                        return;
+                    }
+
+                    $imageInfo = @getimagesize($value->getRealPath());
+                    if ($imageInfo === false) {
+                        $fail('The proof file must be a valid image.');
+                        return;
+                    }
+
+                    $allowedMimes = ['image/jpeg', 'image/png'];
+                    if (!in_array($imageInfo['mime'], $allowedMimes, true)) {
+                        $fail('The proof file must be a JPG, JPEG, or PNG.');
+                    }
+                },
+            ],
 
             // ---- V. Psychological Test Records ----
             // Capped to fit the table-fixed layout's hard column widths
