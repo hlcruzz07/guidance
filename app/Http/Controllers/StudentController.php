@@ -53,7 +53,7 @@ class StudentController extends Controller
             };
 
             if (!$connection) {
-                return back()->with('error', 'Invalid selected campus.');
+                return redirect()->route('home')->with('error', 'Invalid selected campus.');
             }
 
             // Step 1: check if the student exists at all (id + birthdate match)
