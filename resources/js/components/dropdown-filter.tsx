@@ -1,12 +1,13 @@
-import { ChevronDownIcon, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { ChevronDownIcon } from 'lucide-react';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 
 type DropdownFilterProps = {
     label: string;

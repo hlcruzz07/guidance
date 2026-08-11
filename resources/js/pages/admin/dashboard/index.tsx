@@ -1,5 +1,4 @@
 import { Head, usePage } from '@inertiajs/react';
-import { dashboard } from '@/routes';
 import {
     Users,
     UserPlus,
@@ -7,13 +6,14 @@ import {
     HeartHandshake,
     TrendingUp,
 } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
 import {
     RadialBarChart,
     RadialBar,
     PolarAngleAxis,
     ResponsiveContainer,
 } from 'recharts';
+import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes';
 
 type DashboardStats = {
     total_students: number;

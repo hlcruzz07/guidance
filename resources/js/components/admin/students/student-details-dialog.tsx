@@ -1,14 +1,3 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-} from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import type { Student } from '@/types/entities';
 import dayjs from 'dayjs';
 import {
     ImageIcon,
@@ -23,9 +12,20 @@ import {
     MessageSquareText,
     ZoomIn,
 } from 'lucide-react';
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { getSignature, getProof } from '@/routes';
-import { useState } from 'react';
+import type { Student } from '@/types/entities';
 
 type Props = {
     open: boolean;
@@ -95,7 +95,10 @@ function EmptyState({ label }: { label: string }) {
 // Builds a full, browser-loadable URL from a raw Google Drive file id
 // using the getProof Wayfinder route.
 function resolveProofUrl(proof: string | null | undefined): string | null {
-    if (!proof) return null;
+    if (!proof) {
+return null;
+}
+
     return getProof(proof).url;
 }
 
@@ -153,7 +156,9 @@ export default function StudentDetailsDialog({
         label?: string;
     } | null>(null);
 
-    if (!student) return null;
+    if (!student) {
+return null;
+}
 
     const initials = [student.fname?.[0], student.lname?.[0]]
         .filter(Boolean)

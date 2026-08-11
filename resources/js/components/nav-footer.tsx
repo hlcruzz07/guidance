@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import type { ComponentPropsWithoutRef } from 'react';
 import {
     SidebarGroup,
@@ -6,10 +7,9 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useCurrentUrl } from '@/hooks/use-current-url';
 import { toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { useCurrentUrl } from '@/hooks/use-current-url';
 
 export function NavFooter({
     items,
@@ -19,6 +19,7 @@ export function NavFooter({
     items: NavItem[];
 }) {
     const { isCurrentUrl } = useCurrentUrl();
+
     return (
         <SidebarGroup
             {...props}

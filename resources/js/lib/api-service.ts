@@ -12,6 +12,7 @@ const apiService = axios.create({
 
 apiService.interceptors.request.use((config) => {
     const csrfToken = document.querySelector('meta[name="csrf-token"]');
+
     if (csrfToken) {
         const token = csrfToken.getAttribute('content');
 

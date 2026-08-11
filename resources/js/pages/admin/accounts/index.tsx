@@ -1,26 +1,26 @@
 import { Head, usePage } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, PaginateUsers, User } from '@/types';
-import { accounts, paginateAccounts } from '@/routes';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
 
-import apiService from '@/lib/api-service';
-import { Button } from '@/components/ui/button';
 import { UserPenIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import AccountFilter from '@/components/admin/accounts/accounts-table-filter';
+import { AddAccountDialog } from '@/components/admin/accounts/add-account-dialog';
+import { EditAccountDialog } from '@/components/admin/accounts/edit-account-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
+import AppLayout from '@/layouts/app-layout';
 import TableLayout from '@/layouts/table-layout';
-import AccountFilter from '@/components/admin/accounts/accounts-table-filter';
-import { EditAccountDialog } from '@/components/admin/accounts/edit-account-dialog';
-import { AddAccountDialog } from '@/components/admin/accounts/add-account-dialog';
+import apiService from '@/lib/api-service';
+import { accounts, paginateAccounts } from '@/routes';
+import type { BreadcrumbItem, PaginateUsers, User } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -275,6 +275,7 @@ export default function Index() {
                                                         let page:
                                                             string | null =
                                                             null;
+
                                                         if (link.url) {
                                                             const url = new URL(
                                                                 link.url,
@@ -295,8 +296,10 @@ export default function Index() {
                                                                     e,
                                                                 ) => {
                                                                     e.preventDefault();
-                                                                    if (!page)
-                                                                        return;
+
+                                                                    if (!page) {
+return;
+}
 
                                                                     try {
                                                                         const {

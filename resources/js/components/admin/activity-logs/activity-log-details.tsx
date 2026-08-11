@@ -1,12 +1,3 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import dayjs from 'dayjs';
 import {
     Activity,
@@ -18,6 +9,15 @@ import {
     Mail,
     Clock,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
 
 type ActivityLog = {
     id: number;
@@ -58,7 +58,9 @@ export default function ActivityLogDetailsDialog({
     setOpen,
     log,
 }: Props) {
-    if (!log) return null;
+    if (!log) {
+return null;
+}
 
     const ActionIcon = actionIcons[log.action] ?? Activity;
 

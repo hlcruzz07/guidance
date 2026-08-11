@@ -1,9 +1,9 @@
-import { Button } from '@/components/ui/button';
-import ThemeButton from '@/components/ThemeButton';
 import { usePage } from '@inertiajs/react';
+import { ShieldCheck } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { ShieldCheck } from 'lucide-react';
+import ThemeButton from '@/components/ThemeButton';
+import { Button } from '@/components/ui/button';
 
 export type FlashMessages = {
     success?: string | null;
@@ -43,13 +43,28 @@ export default function Index() {
     const flash: FlashMessages = usePage().props.flash || {};
 
     useEffect(() => {
-        if (!flash) return;
+        if (!flash) {
+return;
+}
+
         const timeoutId = setTimeout(() => {
-            if (flash.success) toast.success(flash.success);
-            if (flash.error) toast.error(flash.error);
-            if (flash.info) toast.info(flash.info);
-            if (flash.warning) toast.warning(flash.warning);
+            if (flash.success) {
+toast.success(flash.success);
+}
+
+            if (flash.error) {
+toast.error(flash.error);
+}
+
+            if (flash.info) {
+toast.info(flash.info);
+}
+
+            if (flash.warning) {
+toast.warning(flash.warning);
+}
         }, 100);
+
         return () => clearTimeout(timeoutId);
     }, [flash]);
 

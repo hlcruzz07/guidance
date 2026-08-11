@@ -1,17 +1,4 @@
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-import type { StudentFilters, Student } from '@/types/entities';
 import { Head, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
-import TableLayout from '@/layouts/table-layout';
-import apiService from '@/lib/api-service';
 
 import dayjs from 'dayjs';
 import {
@@ -26,15 +13,28 @@ import {
     UserPlus,
     Venus,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { getSignature, paginateStudents } from '@/routes';
-import { defaultStudentFilters, PaginateStudents } from '@/types/entities';
-import TableFilter from '@/components/admin/students/table-filter';
 import StudentDetailsDialog from '@/components/admin/students/student-details-dialog';
 import StudentSIIPrintForm from '@/components/admin/students/student-print-form';
 import StudentRemarksDialog from '@/components/admin/students/student-remarks-dialog';
-import { useDropdowns } from '@/hooks/use-dropdowns';
+import TableFilter from '@/components/admin/students/table-filter';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useDropdowns } from '@/hooks/use-dropdowns';
+import AppLayout from '@/layouts/app-layout';
+import TableLayout from '@/layouts/table-layout';
+import apiService from '@/lib/api-service';
+import { getSignature, paginateStudents } from '@/routes';
+import type { BreadcrumbItem } from '@/types';
+import { defaultStudentFilters } from '@/types/entities';
+import type { StudentFilters, Student , PaginateStudents } from '@/types/entities';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -90,10 +90,15 @@ export default function Index() {
     }, [filter]);
 
     useEffect(() => {
-        if (!printStudent) return;
+        if (!printStudent) {
+return;
+}
 
         const printRoot = document.getElementById('print-root');
-        if (!printRoot) return;
+
+        if (!printRoot) {
+return;
+}
 
         const images = Array.from(printRoot.querySelectorAll('img'));
 
@@ -513,6 +518,7 @@ export default function Index() {
                                                         let page:
                                                             string | null =
                                                             null;
+
                                                         if (link.url) {
                                                             const url = new URL(
                                                                 link.url,
@@ -533,8 +539,10 @@ export default function Index() {
                                                                     e,
                                                                 ) => {
                                                                     e.preventDefault();
-                                                                    if (!page)
-                                                                        return;
+
+                                                                    if (!page) {
+return;
+}
 
                                                                     try {
                                                                         const {

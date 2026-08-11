@@ -1,9 +1,9 @@
 import { usePage } from '@inertiajs/react';
 
-import AppLogoIcon from '@/components/app-logo-icon';
-import { Badge } from './ui/badge';
-import { normalizeName } from '@/lib/utils';
 import { UserIcon } from 'lucide-react';
+import AppLogoIcon from '@/components/app-logo-icon';
+import { normalizeName } from '@/lib/utils';
+import { Badge } from './ui/badge';
 
 export default function AppLogo() {
     const { name } = usePage().props;

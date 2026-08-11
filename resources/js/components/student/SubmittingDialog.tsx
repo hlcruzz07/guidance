@@ -1,6 +1,6 @@
+import { Loader2 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
-import { Loader2 } from 'lucide-react';
 
 interface SubmittingDialogProps {
     open: boolean;

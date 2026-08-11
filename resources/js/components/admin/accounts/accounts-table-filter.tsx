@@ -1,3 +1,20 @@
+import { format } from 'date-fns';
+import isEqual from 'lodash/isEqual';
+import {
+    ArrowDownNarrowWide,
+    ArrowUpNarrowWide,
+    ArrowUpDownIcon,
+    CalendarIcon,
+    ChevronDownIcon,
+    MailCheckIcon,
+    RefreshCwIcon,
+    SearchIcon,
+    ShieldIcon,
+    SlidersHorizontalIcon,
+    XIcon,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -16,23 +33,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { format } from 'date-fns';
-import isEqual from 'lodash/isEqual';
-import {
-    ArrowDownNarrowWide,
-    ArrowUpNarrowWide,
-    ArrowUpDownIcon,
-    CalendarIcon,
-    ChevronDownIcon,
-    MailCheckIcon,
-    RefreshCwIcon,
-    SearchIcon,
-    ShieldIcon,
-    SlidersHorizontalIcon,
-    XIcon,
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { DateRange } from 'react-day-picker';
 import { Button } from '../../ui/button';
 import { AddAccountDialog } from './add-account-dialog';
 
@@ -105,6 +105,7 @@ export default function AccountFilter({
             onClear: () => setFilter('role', null),
         });
     }
+
     if (data.email) {
         activeChips.push({
             key: 'email',
@@ -112,6 +113,7 @@ export default function AccountFilter({
             onClear: () => setFilter('email', null),
         });
     }
+
     if (range?.from && range?.to) {
         activeChips.push({
             key: 'date',
@@ -126,6 +128,7 @@ export default function AccountFilter({
 
     const hasActiveFilters = !isEqual(defaultAccountFilters, data);
     const [openAddAccount, setOpenAddAccount] = useState(false);
+
     return (
         <div className="space-y-3">
             <AddAccountDialog

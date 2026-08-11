@@ -1,11 +1,11 @@
+import { usePage } from '@inertiajs/react';
+import { UserIcon } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { normalizeName } from '@/lib/utils';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import ThemeButton from './ThemeButton';
-import { usePage } from '@inertiajs/react';
-import { normalizeName } from '@/lib/utils';
 import { Badge } from './ui/badge';
-import { UserIcon } from 'lucide-react';
 
 export function AppSidebarHeader({
     breadcrumbs = [],

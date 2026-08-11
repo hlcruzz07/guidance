@@ -1,3 +1,7 @@
+import { useForm } from '@inertiajs/react';
+import { Asterisk, MailIcon, UserIcon, X } from 'lucide-react';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,14 +24,10 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { handleErrors, normalizeName } from '@/lib/utils';
 // import { updateAccount } from '@/routes';
-import { User } from '@/types';
-// import { RoleProps } from '@/types/role';
-import { useForm } from '@inertiajs/react';
-import { Asterisk, MailIcon, UserIcon, X } from 'lucide-react';
-import { useEffect } from 'react';
-import { toast } from 'sonner';
-import { Field, FieldError, FieldLabel } from '../../ui/field';
 import { updateAccount } from '@/routes';
+import type { User } from '@/types';
+// import { RoleProps } from '@/types/role';
+import { Field, FieldError, FieldLabel } from '../../ui/field';
 
 type FormData = {
     email: string;
@@ -53,6 +53,7 @@ export function EditAccountDialog({
 }) {
     if (!user && open) {
         toast.error('No selected user found');
+
         return;
     }
 
@@ -67,9 +68,13 @@ export function EditAccountDialog({
     const handleForm = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (processing) return;
+        if (processing) {
+return;
+}
 
-        if (!user || !user.id) return;
+        if (!user || !user.id) {
+return;
+}
 
         put(updateAccount(user.id).url, {
             preserveScroll: true,
@@ -86,7 +91,10 @@ export function EditAccountDialog({
     };
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+return;
+}
+
         setData({
             email: user?.email || '',
             name: user?.name || '',

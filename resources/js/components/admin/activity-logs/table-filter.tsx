@@ -1,3 +1,19 @@
+import { format } from 'date-fns';
+import isEqual from 'lodash/isEqual';
+import {
+    ArrowDownNarrowWide,
+    ArrowUpNarrowWide,
+    ArrowUpDownIcon,
+    ActivityIcon,
+    CalendarIcon,
+    ChevronDownIcon,
+    RefreshCwIcon,
+    SearchIcon,
+    SlidersHorizontalIcon,
+    XIcon,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
 import DropdownFilter from '@/components/dropdown-filter';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
@@ -17,22 +33,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { format } from 'date-fns';
-import isEqual from 'lodash/isEqual';
-import {
-    ArrowDownNarrowWide,
-    ArrowUpNarrowWide,
-    ArrowUpDownIcon,
-    ActivityIcon,
-    CalendarIcon,
-    ChevronDownIcon,
-    RefreshCwIcon,
-    SearchIcon,
-    SlidersHorizontalIcon,
-    XIcon,
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { DateRange } from 'react-day-picker';
 
 export type ActivityLogFilters = {
     search: string | null;
@@ -98,6 +98,7 @@ export default function ActivityLogFilter({
             onClear: () => setFilter('action', null),
         });
     }
+
     if (range?.from && range?.to) {
         activeChips.push({
             key: 'date',
@@ -294,7 +295,9 @@ export default function ActivityLogFilter({
                                 captionLayout="dropdown"
                                 classNames={{ today: '' }}
                                 onSelect={(newRange) => {
-                                    if (!newRange) return;
+                                    if (!newRange) {
+return;
+}
 
                                     setRange(newRange);
 

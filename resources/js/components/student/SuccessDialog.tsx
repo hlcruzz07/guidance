@@ -1,6 +1,6 @@
-import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { CheckCircle2, HomeIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 
 interface SuccessDialogProps {
     open: boolean;

@@ -1,14 +1,14 @@
-import type { Student } from '@/types/entities';
-import { createPortal } from 'react-dom';
-import { Field, FieldGroup, FieldLabel } from '../../ui/field';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '../../ui/label';
-import { useDropdowns } from '@/hooks/use-dropdowns';
-import { CheckIcon } from 'lucide-react';
-import dayjs from 'dayjs';
 import { tr } from 'date-fns/locale';
+import dayjs from 'dayjs';
+import { CheckIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useDropdowns } from '@/hooks/use-dropdowns';
 import { getSignature } from '@/routes';
+import type { Student } from '@/types/entities';
+import { Field, FieldGroup, FieldLabel } from '../../ui/field';
+import { Label } from '../../ui/label';
 
 type Props = {
     student: Student | null;
@@ -39,7 +39,9 @@ export default function StudentSIIPrintForm({ student }: Props) {
     const USABLE_HEIGHT_PX = PAGE_HEIGHT_PX - PAGE_VERTICAL_MARGIN_PX;
 
     useEffect(() => {
-        if (!student || !printRootRef.current) return;
+        if (!student || !printRootRef.current) {
+return;
+}
 
         const el = printRootRef.current;
 
@@ -55,13 +57,16 @@ export default function StudentSIIPrintForm({ student }: Props) {
         resizeObserver.observe(el);
 
         window.addEventListener('beforeprint', calculatePages);
+
         return () => {
             resizeObserver.disconnect();
             window.removeEventListener('beforeprint', calculatePages);
         };
     }, [student]);
     useEffect(() => {
-        if (!student || !page1Ref.current) return;
+        if (!student || !page1Ref.current) {
+return;
+}
 
         const el = page1Ref.current;
 
@@ -81,6 +86,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
         const resizeObserver = new ResizeObserver(fit);
         resizeObserver.observe(el);
         window.addEventListener('beforeprint', fit);
+
         return () => {
             resizeObserver.disconnect();
             window.removeEventListener('beforeprint', fit);
@@ -91,18 +97,27 @@ export default function StudentSIIPrintForm({ student }: Props) {
         setSignatureError(false);
     }, [student]);
 
-    if (!student) return null;
+    if (!student) {
+return null;
+}
 
     const father = student.guardians?.find((g) => g.relationship === 'Father');
     const mother = student.guardians?.find((g) => g.relationship === 'Mother');
 
     const parentRowCount = 11; // Name, Age, Contact Number, ...
     const siblingRows = [...(student.siblings ?? [])].sort((a, b) => {
-        if (!a.birthdate) return 1;
-        if (!b.birthdate) return -1;
+        if (!a.birthdate) {
+return 1;
+}
+
+        if (!b.birthdate) {
+return -1;
+}
+
         return dayjs(a.birthdate).diff(dayjs(b.birthdate));
     });
     const totalRows = Math.max(parentRowCount, siblingRows.length);
+
     return createPortal(
         <table
             id="print-root"

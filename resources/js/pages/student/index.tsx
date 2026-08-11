@@ -1,4 +1,21 @@
+import { useForm, usePage } from '@inertiajs/react';
+import {
+    Asterisk,
+    Check,
+    ChevronsUpDown,
+    CopyCheck,
+    MailIcon,
+    PhoneIcon,
+    Plus,
+    RulerIcon,
+    SendIcon,
+    Star,
+    Trash2,
+    WeightIcon,
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import Heading from '@/components/heading';
+import ThemeButton from '@/components/ThemeButton';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -56,30 +73,14 @@ import {
     handleErrors,
 } from '@/lib/utils';
 
-import {
-    Education,
+import type {
     EquityGroup,
     Guardian,
     PsychTest,
     Student,
     StudentRecord,
 } from '@/types/entities';
-import { useForm, usePage } from '@inertiajs/react';
-import {
-    Asterisk,
-    Check,
-    ChevronsUpDown,
-    CopyCheck,
-    MailIcon,
-    PhoneIcon,
-    Plus,
-    RulerIcon,
-    SendIcon,
-    Star,
-    Trash2,
-    WeightIcon,
-} from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Education } from '@/types/entities';
 
 type StudentForm = Omit<
     Student,
@@ -226,7 +227,6 @@ type ConcernAnswerState = {
     subAnswer: string;
 };
 import { Spinner } from '@/components/ui/spinner';
-import ThemeButton from '@/components/ThemeButton';
 import { ca } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { storeStudent } from '@/routes';
@@ -250,6 +250,67 @@ export default function Index() {
         concerns,
         highestEducationalAttainments,
     } = useDropdowns();
+    const { data, setData, processing, post, errors, progress } =
+        useForm<StudentForm>({
+            id_number: '',
+            campus: '',
+            e_signature: null,
+            fname: '',
+            mname: null,
+            lname: '',
+            suffix: null,
+
+            email: '',
+            phone: '',
+
+            type: '',
+            course: '',
+            year_level: null,
+            section: '',
+
+            gender: '',
+            civil_status: '',
+            sexual_orientation: '',
+
+            height: null,
+            weight: null,
+            nationality: '',
+            religion: '',
+
+            date_of_birth: '',
+            place_of_birth: '',
+
+            last_school_attended: '',
+
+            current_address: '',
+            home_address: '',
+
+            general_average: '',
+            strand_course: '',
+            scholarship: null,
+            has_scholarship: false,
+
+            contact_person: '',
+            contact_person_address: '',
+            contact_person_mobile_um: '',
+            contact_person_relationship: '',
+
+            parent_marital_relationship: '',
+            birth_order: '',
+            financer: '',
+
+            weekly_allowance: '',
+            household_income: '',
+
+            nature_of_residence: '',
+
+            guardians: [],
+            educations: [],
+            siblings: [],
+            psych_tests: [],
+            equity_groups: [],
+            concerns: [],
+        });
 
     const createEmptyConcernAnswers = (): ConcernAnswerState[] =>
         concerns.map(() => ({ answer: '', subAnswer: '' }));
@@ -294,6 +355,7 @@ export default function Index() {
             entries[education_level] =
                 createEmptyEducationEntry(education_level);
         });
+
         return entries;
     });
     const [includeCollege, setIncludeCollege] = useState(false);
@@ -301,8 +363,14 @@ export default function Index() {
 
     const visibleEducationLevels = useMemo(() => {
         return EDUCATION_LEVELS_ORDER.filter((education_level) => {
-            if (education_level === 'College') return includeCollege;
-            if (education_level === 'Vocational') return includeVocational;
+            if (education_level === 'College') {
+                return includeCollege;
+            }
+
+            if (education_level === 'Vocational') {
+                return includeVocational;
+            }
+
             return true; // Senior High, Junior High, Elementary are always shown
         });
     }, [includeCollege, includeVocational]);
@@ -329,13 +397,17 @@ export default function Index() {
         GUARDIAN_TYPES_ORDER.forEach((relationship) => {
             entries[relationship] = createEmptyGuardianEntry(relationship);
         });
+
         return entries;
     });
     const [includeGuardian, setIncludeGuardian] = useState(false);
 
     const visibleGuardianTypes = useMemo(() => {
         return GUARDIAN_TYPES_ORDER.filter((relationship) => {
-            if (relationship === 'Guardian') return includeGuardian;
+            if (relationship === 'Guardian') {
+                return includeGuardian;
+            }
+
             return true; // Father and Mother always shown
         });
     }, [includeGuardian]);
@@ -404,6 +476,7 @@ export default function Index() {
     const toggleEquityGroup = (group: string, checked: boolean) => {
         setEquityGroupEntries((prev) => {
             const next = { ...prev };
+
             if (checked) {
                 next[group] = {
                     group,
@@ -415,6 +488,7 @@ export default function Index() {
             } else {
                 delete next[group];
             }
+
             return next;
         });
     };
@@ -491,6 +565,7 @@ export default function Index() {
             setSubAnswerErrors((prev) => {
                 const next = { ...prev };
                 delete next[index];
+
                 return next;
             });
         }
@@ -584,67 +659,6 @@ export default function Index() {
     // if (!student) {
     //     window.location.href = '/';
     // }
-    const { data, setData, processing, post, errors, progress } =
-        useForm<StudentForm>({
-            id_number: '',
-            campus: '',
-            e_signature: null,
-            fname: '',
-            mname: null,
-            lname: '',
-            suffix: null,
-
-            email: '',
-            phone: '',
-
-            type: '',
-            course: '',
-            year_level: null,
-            section: '',
-
-            gender: '',
-            civil_status: '',
-            sexual_orientation: '',
-
-            height: null,
-            weight: null,
-            nationality: '',
-            religion: '',
-
-            date_of_birth: '',
-            place_of_birth: '',
-
-            last_school_attended: '',
-
-            current_address: '',
-            home_address: '',
-
-            general_average: '',
-            strand_course: '',
-            scholarship: null,
-            has_scholarship: false,
-
-            contact_person: '',
-            contact_person_address: '',
-            contact_person_mobile_um: '',
-            contact_person_relationship: '',
-
-            parent_marital_relationship: '',
-            birth_order: '',
-            financer: '',
-
-            weekly_allowance: '',
-            household_income: '',
-
-            nature_of_residence: '',
-
-            guardians: [],
-            educations: [],
-            siblings: [],
-            psych_tests: [],
-            equity_groups: [],
-            concerns: [],
-        });
 
     const formErrors = errors as unknown as Record<string, string | undefined>;
     const [subAnswerErrors, setSubAnswerErrors] = useState<
@@ -659,12 +673,14 @@ export default function Index() {
 
         if (!dataPrivacyConsent) {
             toast.error('Please check the Data Privacy Consent box to submit.');
+
             return;
         }
 
         const missingSubAnswerIndex = concerns.findIndex(
             (q: ConcernQuestion, index: number) => {
                 const entry = concernAnswers[index];
+
                 return (
                     !!q.sub_question &&
                     entry.answer === 'Yes' &&
@@ -860,8 +876,10 @@ export default function Index() {
                                                 'sexual_orientation',
                                                 value,
                                             );
+
                                             return;
                                         }
+
                                         setData('sexual_orientation', '');
                                     }}
                                 >
@@ -1337,6 +1355,7 @@ export default function Index() {
                                 ) {
                                     return;
                                 }
+
                                 const next = data.scholarship === null;
                                 setData('scholarship', next ? '' : null);
                                 setData('has_scholarship', next);
@@ -1414,8 +1433,10 @@ export default function Index() {
                                     disabled={!!student.person_notify_name}
                                     maxLength={50}
                                     onChange={(e) => {
-                                        if (!!student.person_notify_name)
+                                        if (student.person_notify_name) {
                                             return;
+                                        }
+
                                         setData(
                                             'contact_person',
                                             capitalizeString(e.target.value),
@@ -1447,8 +1468,10 @@ export default function Index() {
                                     disabled={!!student.person_notify_address}
                                     maxLength={100}
                                     onChange={(e) => {
-                                        if (!!student.person_notify_address)
+                                        if (student.person_notify_address) {
                                             return;
+                                        }
+
                                         setData(
                                             'contact_person_address',
                                             capitalizeString(e.target.value),
@@ -1488,9 +1511,11 @@ export default function Index() {
                                         id="contact_person_mobile_um"
                                         onChange={(e) => {
                                             if (
-                                                !!student.person_notify_cellphone
-                                            )
+                                                student.person_notify_cellphone
+                                            ) {
                                                 return;
+                                            }
+
                                             const value = e.target.value.slice(
                                                 0,
                                                 10,
@@ -2437,6 +2462,7 @@ export default function Index() {
                                                     'life_status',
                                                     value,
                                                 );
+
                                                 if (value !== 'Deceased') {
                                                     updateGuardianField(
                                                         relationship,
@@ -2551,8 +2577,10 @@ export default function Index() {
                                                 'parent_marital_relationship',
                                                 value,
                                             );
+
                                             return;
                                         }
+
                                         setData(
                                             'parent_marital_relationship',
                                             '',
@@ -2652,8 +2680,10 @@ export default function Index() {
 
                                         if (value !== 'Others') {
                                             setData('financer', value);
+
                                             return;
                                         }
+
                                         setData('financer', '');
                                     }}
                                 >
@@ -2797,8 +2827,10 @@ export default function Index() {
                                                 'nature_of_residence',
                                                 value,
                                             );
+
                                             return;
                                         }
+
                                         setData('nature_of_residence', '');
                                     }}
                                 >
@@ -3146,7 +3178,10 @@ export default function Index() {
 
                             const submittedIndex =
                                 data.equity_groups?.findIndex((item) => {
-                                    if (!item.equity_group) return false;
+                                    if (!item.equity_group) {
+                                        return false;
+                                    }
+
                                     return (
                                         item.equity_group === group ||
                                         item.equity_group.startsWith(group)
@@ -3160,6 +3195,7 @@ export default function Index() {
                                     key={group}
                                     onClick={(e) => {
                                         const target = e.target as HTMLElement;
+
                                         if (
                                             target.closest(
                                                 '[data-checkbox-toggle]',
@@ -3170,6 +3206,7 @@ export default function Index() {
                                         ) {
                                             return;
                                         }
+
                                         toggleEquityGroup(group, !isChecked);
                                     }}
                                     className={`cursor-pointer space-y-3 rounded-lg border p-4 transition-all ${

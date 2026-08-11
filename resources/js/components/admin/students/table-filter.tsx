@@ -1,3 +1,24 @@
+import { format } from 'date-fns';
+import isEqual from 'lodash/isEqual';
+import {
+    ArrowDownNarrowWide,
+    ArrowUpNarrowWide,
+    ArrowUpDownIcon,
+    BookTextIcon,
+    CalendarIcon,
+    ChartNoAxesColumn,
+    ChevronDownIcon,
+    GraduationCap,
+    RefreshCwIcon,
+    School2,
+    SearchIcon,
+    SlidersHorizontalIcon,
+    Users2,
+    XIcon,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
+import DropdownFilter from '@/components/dropdown-filter';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -18,30 +39,10 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useDropdowns } from '@/hooks/use-dropdowns';
-import { defaultStudentFilters, StudentFilters } from '@/types/entities';
-import { format } from 'date-fns';
-import isEqual from 'lodash/isEqual';
-import {
-    ArrowDownNarrowWide,
-    ArrowUpNarrowWide,
-    ArrowUpDownIcon,
-    BookTextIcon,
-    CalendarIcon,
-    ChartNoAxesColumn,
-    ChevronDownIcon,
-    GraduationCap,
-    RefreshCwIcon,
-    School2,
-    SearchIcon,
-    SlidersHorizontalIcon,
-    Users2,
-    XIcon,
-} from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { DateRange } from 'react-day-picker';
 import apiService from '@/lib/api-service';
 import { fetchCourses, fetchSections, fetchYearLevels } from '@/routes';
-import DropdownFilter from '@/components/dropdown-filter';
+import type { StudentFilters } from '@/types/entities';
+import { defaultStudentFilters } from '@/types/entities';
 
 type FilterProps = {
     data: StudentFilters;
@@ -127,6 +128,7 @@ export default function TableFilter({
             onClear: () => setFilter('type', null),
         });
     }
+
     if (data.campus) {
         activeChips.push({
             key: 'campus',
@@ -142,6 +144,7 @@ export default function TableFilter({
             },
         });
     }
+
     if (data.course) {
         activeChips.push({
             key: 'course',
@@ -155,6 +158,7 @@ export default function TableFilter({
             },
         });
     }
+
     if (data.year_level) {
         activeChips.push({
             key: 'year_level',
@@ -166,6 +170,7 @@ export default function TableFilter({
             },
         });
     }
+
     if (data.section) {
         activeChips.push({
             key: 'section',
@@ -173,6 +178,7 @@ export default function TableFilter({
             onClear: () => setFilter('section', null),
         });
     }
+
     if (range?.from && range?.to) {
         activeChips.push({
             key: 'date',
@@ -371,7 +377,9 @@ export default function TableFilter({
                             setYearLevels([]);
                             setSections([]);
 
-                            if (value) getCourses(value);
+                            if (value) {
+getCourses(value);
+}
                         }}
                         icon={School2}
                     />
@@ -389,8 +397,9 @@ export default function TableFilter({
                             setYearLevels([]);
                             setSections([]);
 
-                            if (data.campus && value)
-                                getYearLevels(data.campus, value);
+                            if (data.campus && value) {
+getYearLevels(data.campus, value);
+}
                         }}
                         icon={GraduationCap}
                     />
@@ -456,7 +465,9 @@ export default function TableFilter({
                                 captionLayout="dropdown"
                                 classNames={{ today: '' }}
                                 onSelect={(newRange) => {
-                                    if (!newRange) return;
+                                    if (!newRange) {
+return;
+}
 
                                     setRange(newRange);
 

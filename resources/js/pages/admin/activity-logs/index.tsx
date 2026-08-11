@@ -1,17 +1,4 @@
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
-import TableLayout from '@/layouts/table-layout';
-import apiService from '@/lib/api-service';
-
 import dayjs from 'dayjs';
 import {
     Activity,
@@ -23,10 +10,7 @@ import {
     Eye,
     PencilLine,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { paginateActivityLogs } from '@/routes';
-import ActivityLogDetailsDialog from '@/components/admin/activity-logs/activity-log-details';
-import ActivityLogFilter from '@/components/admin/activity-logs/table-filter';
+import { useState, useEffect } from 'react';
 import {
     RadialBarChart,
     RadialBar,
@@ -40,6 +24,22 @@ import {
     CartesianGrid,
     Tooltip as RechartsTooltip,
 } from 'recharts';
+import { toast } from 'sonner';
+import ActivityLogDetailsDialog from '@/components/admin/activity-logs/activity-log-details';
+import ActivityLogFilter from '@/components/admin/activity-logs/table-filter';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import AppLayout from '@/layouts/app-layout';
+import TableLayout from '@/layouts/table-layout';
+import apiService from '@/lib/api-service';
+
+import { paginateActivityLogs } from '@/routes';
+import type { BreadcrumbItem } from '@/types';
 
 // NOTE: add these to your types/entities.ts, mirroring Student / StudentFilters / PaginateStudents
 type ActivityLog = {
@@ -500,6 +500,7 @@ export default function Index() {
                                                         let page:
                                                             string | null =
                                                             null;
+
                                                         if (link.url) {
                                                             const url = new URL(
                                                                 link.url,
@@ -520,8 +521,10 @@ export default function Index() {
                                                                     e,
                                                                 ) => {
                                                                     e.preventDefault();
-                                                                    if (!page)
-                                                                        return;
+
+                                                                    if (!page) {
+return;
+}
 
                                                                     try {
                                                                         const {

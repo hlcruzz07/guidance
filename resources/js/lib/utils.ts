@@ -12,7 +12,10 @@ export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
 export const capitalizeString = (text: string) => {
-    if (!text) return '';
+    if (!text) {
+return '';
+}
+
     return text
         .toLowerCase()
         .split(' ')
@@ -21,7 +24,9 @@ export const capitalizeString = (text: string) => {
 };
 
 export const uppercaseString = (text: string) => {
-    if (!text) return '';
+    if (!text) {
+return '';
+}
 
     return text.trim().toUpperCase();
 };
@@ -29,13 +34,17 @@ export const uppercaseString = (text: string) => {
 export const fetchNationalities = async (): Promise<string[]> => {
     try {
         const res = await fetch('/nationalities.json');
-        if (!res.ok) throw new Error('Failed to fetch nationalities');
+
+        if (!res.ok) {
+throw new Error('Failed to fetch nationalities');
+}
 
         const data = await res.json();
 
         return data;
     } catch (error) {
         console.error('Error fetching nationalities', error);
+
         return [];
     }
 };
@@ -45,6 +54,7 @@ export const handleErrors = (errors: Record<string, string | string[]>) => {
     // 1. Existing Toast Logic
     errorKeys.reverse().forEach((key) => {
         const messages = errors[key];
+
         if (Array.isArray(messages)) {
             messages.forEach((message) => toast.error(message));
         } else {

@@ -1,3 +1,5 @@
+import { useForm } from '@inertiajs/react';
+import { Asterisk, MailIcon, UserIcon, X } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,10 +21,8 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { capitalizeString, handleErrors, normalizeName } from '@/lib/utils';
-import { useForm } from '@inertiajs/react';
-import { Asterisk, MailIcon, UserIcon, X } from 'lucide-react';
-import { Field, FieldError, FieldLabel } from '../../ui/field';
 import { createAccount } from '@/routes';
+import { Field, FieldError, FieldLabel } from '../../ui/field';
 
 type FormData = {
     email: string;
@@ -56,7 +56,9 @@ export function AddAccountDialog({
     const handleForm = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (processing) return;
+        if (processing) {
+return;
+}
 
         post(createAccount().url, {
             preserveScroll: true,

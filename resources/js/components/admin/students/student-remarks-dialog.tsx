@@ -1,5 +1,10 @@
 // resources/js/components/admin/student-remarks-dialog.tsx
+import { useForm } from '@inertiajs/react';
+import { ClipboardPenIcon, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -8,15 +13,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
-import type { Student } from '@/types/entities';
-import { useForm } from '@inertiajs/react';
-import { ClipboardPenIcon, Loader2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { updateRemarks } from '@/routes';
+import type { Student } from '@/types/entities';
 import { Field, FieldError, FieldLabel } from '../../ui/field';
 import { Input } from '../../ui/input';
 // import { updateStudentRemarks } from '@/routes'; // adjust to your actual route helper
@@ -47,7 +47,9 @@ export default function StudentRemarksDialog({
     }, [open, reset, clearErrors]);
 
     const handleSubmit = () => {
-        if (!student) return;
+        if (!student) {
+return;
+}
 
         put(updateRemarks(student.id!).url, {
             preserveScroll: true,
@@ -64,7 +66,10 @@ export default function StudentRemarksDialog({
         <Dialog
             open={open}
             onOpenChange={(next) => {
-                if (processing) return;
+                if (processing) {
+return;
+}
+
                 setOpen(next);
             }}
         >

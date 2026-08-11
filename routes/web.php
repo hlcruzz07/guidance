@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/form', [StudentController::class, 'form'])->name('studentForm');
 Route::post('/form/store', [StudentController::class, 'store'])->name('storeStudent');
 
-// Guest Routes asdasdasd
+// Guest Routes asdasdasd adasdasd
 Route::middleware('guest')->group(function () {
     Route::inertia('/', 'welcome')->name('home');
     Route::get('/admin', [AdminController::class, 'index'])->name('admin');

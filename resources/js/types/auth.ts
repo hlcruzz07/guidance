@@ -1,4 +1,4 @@
-import { Student } from './entities';
+import type { Student } from './entities';
 
 export type User = {
     id: number;

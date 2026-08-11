@@ -1,6 +1,13 @@
-import { Button } from '@/components/ui/button';
 import { usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+
+import { useForm } from '@inertiajs/react';
+import { AlertCircleIcon, LogInIcon } from 'lucide-react';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
+import { SubmittingDialog } from '@/components/student/SubmittingDialog';
+import ThemeButton from '@/components/ThemeButton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
     Field,
     FieldDescription,
@@ -18,15 +25,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-
-import { useForm } from '@inertiajs/react';
 import { Spinner } from '@/components/ui/spinner';
-import { AlertCircleIcon, LogInIcon } from 'lucide-react';
 import { studentForm } from '@/routes';
-import { toast } from 'sonner';
-import { SubmittingDialog } from '@/components/student/SubmittingDialog';
-import ThemeButton from '@/components/ThemeButton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 type ValidateForm = {
     id_number: string;
@@ -50,12 +50,15 @@ export default function Welcome() {
         campus: '',
         birthdate: '',
     });
-    const [message, setMessage] = useState<string | null>(null);
+    const message =
+        flash.success || flash.error || flash.info || flash.warning || null;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (processing) return; // Prevent multiple submissions
+        if (processing) {
+            return;
+        } // Prevent multiple submissions
 
         get(studentForm().url, {
             preserveState: true,
@@ -66,20 +69,30 @@ export default function Welcome() {
     };
 
     useEffect(() => {
-        if (!flash) return;
+        if (!flash) {
+            return;
+        }
 
         const timeoutId = setTimeout(() => {
-            if (flash.success) toast.success(flash.success);
-            if (flash.error) toast.error(flash.error);
-            if (flash.info) toast.info(flash.info);
-            if (flash.warning) toast.warning(flash.warning);
+            if (flash.success) {
+                toast.success(flash.success);
+            }
+
+            if (flash.error) {
+                toast.error(flash.error);
+            }
+
+            if (flash.info) {
+                toast.info(flash.info);
+            }
+
+            if (flash.warning) {
+                toast.warning(flash.warning);
+            }
         }, 100);
-        setMessage(
-            flash.success || flash.error || flash.info || flash.warning || null,
-        );
 
         return () => clearTimeout(timeoutId);
-    }, [flash]);
+    }, [flash.success, flash.error, flash.info, flash.warning]);
 
     return (
         <div className="relative flex min-h-screen flex-col bg-background lg:flex-row">
