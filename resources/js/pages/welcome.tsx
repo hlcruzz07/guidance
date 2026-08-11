@@ -101,7 +101,7 @@ export default function Welcome() {
         <div className="relative flex min-h-screen flex-col bg-background lg:flex-row">
             <SuccessDialog
                 open={!!success}
-                onConfirm={() => location.reload()}
+                onConfirm={() => (window.location.href = '/')}
             />
             <SubmittingDialog
                 open={processing}
