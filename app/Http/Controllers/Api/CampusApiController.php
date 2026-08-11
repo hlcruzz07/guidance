@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
-use Illuminate\Http\Request;
 
 class CampusApiController extends Controller
 {
-    public function __construct(protected Student $model)
-    {
-    }
+    public function __construct(protected Student $model) {}
 
     public function fetchCourses(string $campus)
     {

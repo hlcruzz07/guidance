@@ -13,22 +13,22 @@ class UploadFileToGoogleDriveJob implements ShouldQueue
     public function __construct(
         protected array $uploads,
         protected string $campus,
-    ) {
-    }
+    ) {}
 
     public function handle(GoogleDriveService $drive): void
     {
         foreach ($this->uploads as $upload) {
 
-            if (!file_exists($upload['path'])) {
+            if (! file_exists($upload['path'])) {
                 continue;
             }
 
             $modelClass = $upload['model'];
             $record = $modelClass::find($upload['id']);
 
-            if (!$record) {
+            if (! $record) {
                 @unlink($upload['path']);
+
                 continue;
             }
 

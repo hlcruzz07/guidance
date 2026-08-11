@@ -31,7 +31,6 @@ class StudentSeeder extends Seeder
             ->has(Concern::factory()->count(5))
             ->create();
 
-
         Student::factory()->count(2000)->create();
     }
 }

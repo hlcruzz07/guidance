@@ -2,23 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
-use App\Services\HashingService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class CreateAccountRequest extends FormRequest
 {
-
-
     public function authorize(): bool
     {
         return true;
     }
-
-
 
     public function rules(): array
     {
@@ -32,6 +23,7 @@ class CreateAccountRequest extends FormRequest
             'role' => 'required|exists:roles,name',
         ];
     }
+
     public function messages(): array
     {
         return [
@@ -48,5 +40,4 @@ class CreateAccountRequest extends FormRequest
             'role.exists' => 'The selected role is invalid.',
         ];
     }
-
 }

@@ -3,6 +3,9 @@
 namespace Database\Factories;
 
 use App\Enums\StudentType;
+use App\Models\Education;
+use App\Models\Guardian;
+use App\Models\Sibling;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -30,6 +33,7 @@ class StudentFactory extends Factory
         $relationships = ['Father', 'Mother', 'Parent', 'Legal Guardian', 'Spouse', 'Sibling', 'Grandparent', 'Aunt', 'Uncle', 'Relative', 'Friend'];
         $types = [StudentType::FRESHMEN, StudentType::TRANSFEREE, StudentType::SHIFTEE, StudentType::RETURNEE];
         $remarkBy = $this->faker->optional()->numberBetween(User::min('id'), User::max('id'));
+
         return [
             'id_number' => $this->faker->unique()->numerify('20##-#####'),
             'e_signature' => $this->faker->uuid(),
@@ -38,8 +42,8 @@ class StudentFactory extends Factory
             'mname' => $this->faker->optional(0.8)->lastName(),
             'lname' => $this->faker->lastName(),
             'suffix' => $this->faker->optional(0.05)->randomElement(['Jr', 'Sr', 'II', 'III', 'IV', 'V']),
-            'email' => $this->faker->unique()->regexify('[a-z0-9]{10,14}') . '@' . $this->faker->safeEmailDomain(),
-            'phone' => '9' . $this->faker->numerify('#########'),
+            'email' => $this->faker->unique()->regexify('[a-z0-9]{10,14}').'@'.$this->faker->safeEmailDomain(),
+            'phone' => '9'.$this->faker->numerify('#########'),
             'type' => $this->faker->randomElement($types),
             'course' => $this->faker->randomElement($courses),
             'year_level' => (string) $yearLevel,
@@ -51,9 +55,9 @@ class StudentFactory extends Factory
             'weight' => (string) $this->faker->randomFloat(2, 40, 100),
             'religion' => $this->faker->randomElement($religions),
             'date_of_birth' => $this->faker->dateTimeBetween('-30 years', '-16 years')->format('Y-m-d'),
-            'place_of_birth' => $this->faker->city() . ', ' . $this->faker->country(),
+            'place_of_birth' => $this->faker->city().', '.$this->faker->country(),
             'nationality' => $this->faker->optional(0.9)->randomElement(['Filipino', 'American', 'Japanese', 'Korean', 'Chinese']),
-            'last_school_attended' => $this->faker->optional(0.9)->company() . ' ' . $this->faker->randomElement(['High School', 'College', 'Academy']),
+            'last_school_attended' => $this->faker->optional(0.9)->company().' '.$this->faker->randomElement(['High School', 'College', 'Academy']),
             'general_average' => $this->faker->optional(0.8)->randomFloat(2, 75, 99),
             'strand_course' => $this->faker->optional(0.7)->randomElement($strands),
             'scholarship' => $this->faker->optional(0.3)->randomElement(['CHED', 'DOST', 'Local Government', 'Institutional', 'Private']),
@@ -67,7 +71,7 @@ class StudentFactory extends Factory
             'current_address' => $this->faker->address(),
             'contact_person' => $this->faker->name(),
             'contact_person_address' => $this->faker->address(),
-            'contact_person_mobile_um' => '09' . $this->faker->numerify('#########'),
+            'contact_person_mobile_um' => '09'.$this->faker->numerify('#########'),
             'contact_person_relationship' => $this->faker->randomElement($relationships),
             'remark_by' => $remarkBy,
             'remarks' => $remarkBy
@@ -84,14 +88,14 @@ class StudentFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (Student $student) {
-            \App\Models\Guardian::factory()->father()->create(['student_id' => $student->id]);
-            \App\Models\Guardian::factory()->mother()->create(['student_id' => $student->id]);
+            Guardian::factory()->father()->create(['student_id' => $student->id]);
+            Guardian::factory()->mother()->create(['student_id' => $student->id]);
 
             foreach (['Elementary', 'Junior High School', 'Senior High School'] as $level) {
-                \App\Models\Education::factory()->level($level)->create(['student_id' => $student->id]);
+                Education::factory()->level($level)->create(['student_id' => $student->id]);
             }
 
-            \App\Models\Sibling::factory()
+            Sibling::factory()
                 ->count($this->faker->numberBetween(0, 3))
                 ->create(['student_id' => $student->id]);
         });

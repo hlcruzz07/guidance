@@ -27,7 +27,7 @@ class ExternalDecrypter
         }
 
         // Laravel encrypted payloads usually start with "eyJp"
-        if (!str_starts_with($value, 'eyJp')) {
+        if (! str_starts_with($value, 'eyJp')) {
             return $value;
         }
 

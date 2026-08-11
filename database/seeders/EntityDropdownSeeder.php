@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\EntityDropdown;
+use Illuminate\Database\Seeder;
 
 class EntityDropdownSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class EntityDropdownSeeder extends Seeder
                 'Freshmen',
                 'Shiftee',
                 'Transferee',
-                'Returnee'
+                'Returnee',
             ],
 
             'Equity Groups' => [
@@ -63,23 +63,23 @@ class EntityDropdownSeeder extends Seeder
             'Household Monthly Income' => [
                 [
                     'monthly' => 'Less than Php 13,873 - 36,400',
-                    'annual' => 'Php 166,476 - 436,800'
+                    'annual' => 'Php 166,476 - 436,800',
                 ],
                 [
                     'monthly' => 'Php 36,401 - 63,700',
-                    'annual' => 'Php 436,812 - 764,400'
+                    'annual' => 'Php 436,812 - 764,400',
                 ],
                 [
                     'monthly' => 'Php 63,701 - 109,200',
-                    'annual' => 'Php 764,412 - 1,310,400'
+                    'annual' => 'Php 764,412 - 1,310,400',
                 ],
                 [
                     'monthly' => 'Php 109,201 - 182,000',
-                    'annual' => 'Php 1,310,412 - 2,184,000'
+                    'annual' => 'Php 1,310,412 - 2,184,000',
                 ],
                 [
                     'monthly' => 'Above Php 182,001',
-                    'annual' => 'Above Php 2,184,012'
+                    'annual' => 'Above Php 2,184,012',
                 ],
             ],
 
@@ -121,8 +121,8 @@ class EntityDropdownSeeder extends Seeder
                             'question' => 'If yes, what specific concerns did you consult for them for?',
                             'answer_type' => 'text',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
 
             'Religion' => [
@@ -183,7 +183,7 @@ class EntityDropdownSeeder extends Seeder
         foreach ($dropdowns as $name => $values) {
             EntityDropdown::create([
                 'name' => $name,
-                'dropdowns' => $values
+                'dropdowns' => $values,
             ]);
         }
     }

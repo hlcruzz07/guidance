@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Guardian>
+ * @extends Factory<Guardian>
  */
 class GuardianFactory extends Factory
 {
@@ -27,7 +28,7 @@ class GuardianFactory extends Factory
             'relationship' => $this->faker->randomElement(['Father', 'Mother', 'Guardian']),
             'phone' => $this->faker->phoneNumber(),
             'birthdate' => $this->faker->dateTimeBetween('-70 years', '-30 years')->format('Y-m-d'),
-            'birthplace' => $this->faker->city() . ', ' . $this->faker->country(),
+            'birthplace' => $this->faker->city().', '.$this->faker->country(),
             'religion' => $this->faker->randomElement($religions),
             'nationality' => $this->faker->randomElement(['Filipino', 'American', 'Japanese', 'Korean', 'Chinese']),
             'highest_educ_attainment' => $this->faker->randomElement($educAttainments),
@@ -40,22 +41,22 @@ class GuardianFactory extends Factory
 
     public function father(): static
     {
-        return $this->state(fn() => ['relationship' => 'Father']);
+        return $this->state(fn () => ['relationship' => 'Father']);
     }
 
     public function mother(): static
     {
-        return $this->state(fn() => ['relationship' => 'Mother']);
+        return $this->state(fn () => ['relationship' => 'Mother']);
     }
 
     public function guardian(string $label = 'Guardian'): static
     {
-        return $this->state(fn() => ['relationship' => $label]);
+        return $this->state(fn () => ['relationship' => $label]);
     }
 
     public function deceased(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'life_status' => 'Deceased',
             'cause_of_death' => $this->faker->randomElement(['Illness', 'Accident', 'Natural Causes']),
             'year_of_death' => (string) $this->faker->numberBetween(2000, 2024),

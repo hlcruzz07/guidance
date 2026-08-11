@@ -5,17 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CreateAccountRequest;
 use App\Http\Requests\UpdateAccountRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
 class AccountController extends Controller
 {
+    public function __construct(protected User $model) {}
 
-    public function __construct(protected User $model)
-    {
-    }
     /**
      * Display a listing of the resource.
      */
@@ -23,9 +20,8 @@ class AccountController extends Controller
     {
         $roles = Role::all();
 
-
         return Inertia::render('admin/accounts/index', [
-            'roles' => $roles
+            'roles' => $roles,
         ]);
     }
 
@@ -36,7 +32,7 @@ class AccountController extends Controller
             $user = $this->model->create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
             ]);
 
             $user->assignRole($data['role']);
@@ -58,9 +54,8 @@ class AccountController extends Controller
             $user->update([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'email_verified_at' => now()
+                'email_verified_at' => now(),
             ]);
-
 
             $user->syncRoles([$data['role']]);
 

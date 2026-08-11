@@ -8,10 +8,10 @@ class EntityDropdown extends Model
 {
     protected $fillable = [
         'name',
-        'dropdowns'
+        'dropdowns',
     ];
 
     protected $casts = [
-        'dropdowns' => 'array'
+        'dropdowns' => 'array',
     ];
 }

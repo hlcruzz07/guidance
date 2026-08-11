@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\PsychTest;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\PsychTest>
+ * @extends Factory<PsychTest>
  */
 class PsychTestFactory extends Factory
 {

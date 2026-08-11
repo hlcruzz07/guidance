@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Sibling;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Sibling>
+ * @extends Factory<Sibling>
  */
 class SiblingFactory extends Factory
 {
@@ -25,6 +26,6 @@ class SiblingFactory extends Factory
 
     public function employed(): static
     {
-        return $this->state(fn() => ['is_employed' => true]);
+        return $this->state(fn () => ['is_employed' => true]);
     }
 }

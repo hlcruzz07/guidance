@@ -8,10 +8,8 @@ use Illuminate\Http\Request;
 
 class AccountApiController extends Controller
 {
+    public function __construct(protected User $model) {}
 
-    public function __construct(protected User $model)
-    {
-    }
     public function paginate(Request $request)
     {
         $filters = $request->validate([
@@ -23,8 +21,8 @@ class AccountApiController extends Controller
 
         $query = $this->model->query()->with(['roles', 'permissions']);
 
-        if (!empty($filters['search'])) {
-            $search = '%' . $filters['search'] . '%';
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
 
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', $search)
@@ -42,4 +40,3 @@ class AccountApiController extends Controller
         return $query->paginate($show);
     }
 }
-

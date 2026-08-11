@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\AccountApiController;
 use App\Http\Controllers\Api\ActivityLogApiController;
 use App\Http\Controllers\Api\CampusApiController;
 use App\Http\Controllers\Api\StudentApiController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api')->middleware(['auth'])->group(function () {

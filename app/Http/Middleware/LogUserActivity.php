@@ -39,7 +39,7 @@ class LogUserActivity
             return;
         }
 
-        if (!$user) {
+        if (! $user) {
             return;
         }
         // Only log successful/redirected requests by default; flip this off
@@ -111,16 +111,16 @@ class LogUserActivity
      */
     protected function resolveBrowser(?string $userAgent): ?string
     {
-        if (!$userAgent) {
+        if (! $userAgent) {
             return null;
         }
 
         return match (true) {
             str_contains($userAgent, 'Edg/') => 'Edge',
             str_contains($userAgent, 'OPR/') || str_contains($userAgent, 'Opera') => 'Opera',
-            str_contains($userAgent, 'Chrome/') && !str_contains($userAgent, 'Chromium') => 'Chrome',
+            str_contains($userAgent, 'Chrome/') && ! str_contains($userAgent, 'Chromium') => 'Chrome',
             str_contains($userAgent, 'Firefox/') => 'Firefox',
-            str_contains($userAgent, 'Safari/') && !str_contains($userAgent, 'Chrome') => 'Safari',
+            str_contains($userAgent, 'Safari/') && ! str_contains($userAgent, 'Chrome') => 'Safari',
             default => 'Other',
         };
     }

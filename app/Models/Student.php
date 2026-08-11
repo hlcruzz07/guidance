@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Student extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'id_number',
         'campus',
@@ -58,9 +59,9 @@ class Student extends Model
     public function fullName(): Attribute
     {
         return Attribute::make(
-            get: fn() => trim(implode(' ', array_filter([
+            get: fn () => trim(implode(' ', array_filter([
                 $this->fname,
-                $this->mname ? mb_strtoupper(mb_substr($this->mname, 0, 1)) . '.' : null,
+                $this->mname ? mb_strtoupper(mb_substr($this->mname, 0, 1)).'.' : null,
                 $this->lname,
                 $this->suffix ?: null,
             ])))
@@ -70,9 +71,9 @@ class Student extends Model
     public function courseYearSection(): Attribute
     {
         return Attribute::make(
-            get: fn() => trim(implode(' ', array_filter([
+            get: fn () => trim(implode(' ', array_filter([
                 $this->course,
-                $this->year_level . '-' . $this->section,
+                $this->year_level.'-'.$this->section,
             ])))
         );
     }
@@ -81,7 +82,6 @@ class Student extends Model
     {
         return $this->hasMany(Guardian::class, 'student_id');
     }
-
 
     public function educations()
     {
@@ -112,5 +112,4 @@ class Student extends Model
     {
         return $this->belongsTo(User::class, 'remark_by');
     }
-
 }

@@ -8,9 +8,8 @@ use Illuminate\Http\Request;
 
 class ActivityLogApiController extends Controller
 {
-    public function __construct(protected ActivityLog $model)
-    {
-    }
+    public function __construct(protected ActivityLog $model) {}
+
     public function paginate(Request $request)
     {
         $query = ActivityLog::query()->with('user');

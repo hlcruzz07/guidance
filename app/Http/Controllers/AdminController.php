@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Laravel\Socialite\Facades\Socialite;
+use App\Models\Student;
+use App\Models\User;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
-use App\Models\Student;
-use App\Models\ActivityLog;
-use Exception;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Laravel\Socialite\Facades\Socialite;
 
 class AdminController extends Controller
 {
@@ -62,6 +61,7 @@ class AdminController extends Controller
 
         return Socialite::driver('google')->redirect();
     }
+
     public function callback()
     {
         $googleUser = Socialite::driver('google')->user();
@@ -70,21 +70,19 @@ class AdminController extends Controller
 
             $user = User::where('email', $googleUser->getEmail())->first();
 
-            if (!$user) {
+            if (! $user) {
 
                 return redirect()->route('admin')->with('error', 'Invalid credentials');
             }
-
 
             $user->update([
                 'name' => $googleUser->getName(),
                 'avatar' => $googleUser->getAvatar(),
             ]);
 
-
             Auth::login($user);
 
-            return redirect()->route('dashboard')->with('success', 'Welcome ' . $user->name);
+            return redirect()->route('dashboard')->with('success', 'Welcome '.$user->name);
 
         } catch (Exception $e) {
 
@@ -93,7 +91,6 @@ class AdminController extends Controller
             return redirect()->route('admin')->with('error', 'Something went wrong.');
         }
     }
-
 
     public function logout(Request $request)
     {

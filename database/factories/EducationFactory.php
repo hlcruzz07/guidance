@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Education;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Education>
+ * @extends Factory<Education>
  */
 class EducationFactory extends Factory
 {
@@ -23,9 +24,9 @@ class EducationFactory extends Factory
                 'Vocational',
                 'College',
             ]),
-            'school_name' => $this->faker->company() . ' ' . $this->faker->randomElement(['Elementary School', 'National High School', 'Institute', 'College', 'University']),
+            'school_name' => $this->faker->company().' '.$this->faker->randomElement(['Elementary School', 'National High School', 'Institute', 'College', 'University']),
             'school_type' => $this->faker->randomElement(['Public', 'Private']),
-            'year_covered' => $startYear . '-' . ($startYear + 1),
+            'year_covered' => $startYear.'-'.($startYear + 1),
             'honor_receieved' => $this->faker->optional(0.3)->randomElement([
                 'With Honors',
                 'With High Honors',
@@ -38,6 +39,6 @@ class EducationFactory extends Factory
 
     public function level(string $level): static
     {
-        return $this->state(fn() => ['education_level' => $level]);
+        return $this->state(fn () => ['education_level' => $level]);
     }
 }

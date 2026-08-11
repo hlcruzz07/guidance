@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -44,7 +42,7 @@ class RolePermissionSeeder extends Seeder
             'view_permissions',
             'update_permissions',
             'create_permissions',
-            'delete_permissions'
+            'delete_permissions',
         ];
 
         foreach ($permissions as $perm) {
@@ -57,7 +55,6 @@ class RolePermissionSeeder extends Seeder
         // admin gets limited permissions
         $admin->givePermissionTo([
             'view_students',
-
 
         ]);
     }

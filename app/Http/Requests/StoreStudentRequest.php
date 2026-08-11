@@ -280,8 +280,7 @@ class StoreStudentRequest extends FormRequest
             'last_school_attended.string' => 'Last school attended must be valid text.',
             'last_school_attended.max' => 'Last school attended must not exceed 150 characters.',
 
-            'general_average.regex' =>
-                'The general average must be in the format 90/99/89.',
+            'general_average.regex' => 'The general average must be in the format 90/99/89.',
 
             'strand_course.string' => 'Strand / course must be valid text.',
             'strand_course.max' => 'Strand / course must not exceed 20 characters.',
@@ -328,8 +327,7 @@ class StoreStudentRequest extends FormRequest
             'educations.*.school_name.string' => 'School name must be valid text.',
             'educations.*.school_name.max' => 'School name must not exceed 80 characters.',
 
-            'educations.*.year_covered.regex' =>
-                'Year covered must be YYYY-YYYY.',
+            'educations.*.year_covered.regex' => 'Year covered must be YYYY-YYYY.',
 
             'educations.*.school_type.required' => 'Please select whether the school is public or private.',
             'educations.*.school_type.string' => 'School type must be valid text.',

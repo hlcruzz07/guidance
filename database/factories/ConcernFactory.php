@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Concern;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Concern>
+ * @extends Factory<Concern>
  */
 class ConcernFactory extends Factory
 {

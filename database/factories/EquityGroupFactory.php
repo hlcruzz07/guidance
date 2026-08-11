@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\EntityDropdown;
+use App\Models\EquityGroup;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\EquityGroup>
+ * @extends Factory<EquityGroup>
  */
 class EquityGroupFactory extends Factory
 {
@@ -27,7 +28,7 @@ class EquityGroupFactory extends Factory
 
     public function soloParentChild(string $livingWith = 'Mother'): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'equity_group' => "Child of a Solo Parent (Living with Mother or Father) - {$livingWith}",
         ]);
     }

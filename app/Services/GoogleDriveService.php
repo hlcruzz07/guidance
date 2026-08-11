@@ -5,7 +5,6 @@ namespace App\Services;
 use Google\Client;
 use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
-use Illuminate\Http\UploadedFile;
 
 class GoogleDriveService
 {
@@ -13,7 +12,7 @@ class GoogleDriveService
 
     public function __construct()
     {
-        $client = new Client();
+        $client = new Client;
 
         $client->setAuthConfig(base_path(env('GOOGLE_DRIVE_CREDENTIALS')));
         $client->addScope(Drive::DRIVE);

@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\UploadFileToGoogleDriveJob;
-use App\Models\EntityDropdown;
-use App\Models\Student;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreStudentRequest;
+use App\Jobs\UploadFileToGoogleDriveJob;
 use App\Models\EquityGroup;
+use App\Models\Student;
 use App\Repositories\StudentRepo;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -17,8 +16,8 @@ class StudentController extends Controller
 {
     public function __construct(protected StudentRepo $studentRepo)
     {
-
     }
+
     public function index()
     {
         $stats = [
@@ -32,6 +31,7 @@ class StudentController extends Controller
             'stats' => $stats,
         ]);
     }
+
     public function form(Request $request)
     {
         $data = $request->validate([
@@ -216,7 +216,6 @@ class StudentController extends Controller
 
         return back()->with('success', 'Remarks updated successfully');
     }
-
 
     /**
      * Display the specified resource.

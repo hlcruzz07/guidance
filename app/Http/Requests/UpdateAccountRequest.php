@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
-use App\Services\HashingService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateAccountRequest extends FormRequest
@@ -15,7 +14,6 @@ class UpdateAccountRequest extends FormRequest
     {
         return true;
     }
-
 
     public function rules(): array
     {
@@ -37,6 +35,7 @@ class UpdateAccountRequest extends FormRequest
 
         ];
     }
+
     public function messages(): array
     {
         return [

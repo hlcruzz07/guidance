@@ -3,9 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Support\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class UserSeeder extends Seeder
 {

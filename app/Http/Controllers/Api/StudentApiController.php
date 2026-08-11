@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class StudentApiController extends Controller
 {
-    public function __construct(protected Student $model)
-    {
-    }
+    public function __construct(protected Student $model) {}
 
     public function paginate(Request $request)
     {
@@ -32,8 +30,8 @@ class StudentApiController extends Controller
 
         $query = $this->model->query()->with(['guardians', 'siblings', 'educations', 'psychTests', 'equityGroups', 'concerns', 'counselor']);
 
-        if (!empty($filters['search'])) {
-            $search = '%' . $filters['search'] . '%';
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
 
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', $search)
@@ -46,29 +44,27 @@ class StudentApiController extends Controller
             });
         }
 
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
             $query->where('type', $filters['type']);
         }
 
-        if (!empty($filters['campus'])) {
+        if (! empty($filters['campus'])) {
             $query->where('campus', $filters['campus']);
         }
 
-        if (!empty($filters['course'])) {
+        if (! empty($filters['course'])) {
             $query->where('course', $filters['course']);
         }
 
-        if (!empty($filters['year_level'])) {
+        if (! empty($filters['year_level'])) {
             $query->where('year_level', $filters['year_level']);
         }
 
-        if (!empty($filters['section'])) {
+        if (! empty($filters['section'])) {
             $query->where('section', $filters['section']);
         }
 
-
-
-        if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+        if (! empty($filters['date_from']) && ! empty($filters['date_to'])) {
             if ($filters['date_from'] === $filters['date_to']) {
                 $query->whereDate('created_at', '=', $filters['date_from']);
             } else {
