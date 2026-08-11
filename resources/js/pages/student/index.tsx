@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import SignatureModal from '@/components/student/SignaturePad';
 import { SubmittingDialog } from '@/components/student/SubmittingDialog';
-import { SuccessDialog } from '@/components/student/SuccessDialog';
+
 import ThemeButton from '@/components/ThemeButton';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -666,9 +666,6 @@ export default function Index() {
         Record<number, boolean>
     >({});
 
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -714,18 +711,8 @@ export default function Index() {
                 handleErrors(errors);
                 console.error('Form submission errors:', errors);
             },
-            onSuccess: (page) => {
-                setSuccessMessage(
-                    (page.props.message as string) ??
-                        'Your information has been submitted successfully.',
-                );
-                setShowSuccess(true);
-            },
         });
-        // post(route('student-inventory.store'));
     };
-
-    console.log(data);
 
     return (
         <>
@@ -734,11 +721,7 @@ export default function Index() {
                 open={processing}
                 percentage={progress?.percentage}
             />
-            <SuccessDialog
-                open={showSuccess}
-                message={successMessage}
-                onConfirm={() => (window.location.href = '/')}
-            />
+
             <header
                 className="relative flex min-h-150 items-center justify-center bg-cover bg-fixed bg-bottom bg-no-repeat"
                 style={{ backgroundImage: "url('/chmsu.webp')" }}

@@ -165,20 +165,29 @@ class StudentController extends Controller
                             'proof' => null,
                         ]);
 
-                        $tempPath = $group['proof']->store('temp');
+                        // storeAs() with an explicit filename avoids Laravel's
+                        // hashName() -> Symfony MIME guesser -> fileinfo path
+                        // entirely. getClientOriginalExtension() just reads the
+                        // filename suffix from the upload, no content sniffing.
+                        $proofFile = $group['proof'];
+                        $extension = strtolower($proofFile->getClientOriginalExtension()) ?: 'jpg';
+                        $tempFilename = uniqid('proof_', true) . '.' . $extension;
+                        $tempPath = $proofFile->storeAs('temp', $tempFilename);
 
                         $uploads[] = [
                             'model' => EquityGroup::class,
                             'id' => $equityGroup->id,
                             'field' => 'proof',
                             'path' => storage_path("app/private/{$tempPath}"),
-                            'filename' => $group['proof']->getClientOriginalName(),
+                            'filename' => $proofFile->getClientOriginalName(),
                         ];
                     }
                 }
 
                 if ($signatureFile) {
-                    $tempPath = $signatureFile->store('temp');
+                    $sigExtension = strtolower($signatureFile->getClientOriginalExtension()) ?: 'png';
+                    $sigFilename = uniqid('signature_', true) . '.' . $sigExtension;
+                    $tempPath = $signatureFile->storeAs('temp', $sigFilename);
 
                     $uploads[] = [
                         'model' => Student::class,
@@ -194,7 +203,7 @@ class StudentController extends Controller
                 UploadFileToGoogleDriveJob::dispatch($uploads, $campus);
             }
 
-            return back();
+            return redirect()->route('home')->with('success', 'Your information has been submitted successfully.');
         } catch (\Throwable $th) {
             Log::error('Student SII submission failed', [
                 'message' => $th->getMessage(),
@@ -204,7 +213,6 @@ class StudentController extends Controller
             return back()->with('error', 'Something went wrong. Please try again later.');
         }
     }
-
     public function updateRemarks(string $id, Request $request)
     {
         $data = $request->validate([

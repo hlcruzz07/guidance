@@ -38,8 +38,6 @@ type PageProps = {
 export default function Index() {
     const { roles } = usePage<PageProps>().props;
 
-    console.log(roles);
-
     const [accountsData, setAccountsData] = useState<PaginateUsers | null>(
         null,
     );
