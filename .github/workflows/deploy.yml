@@ -13,6 +13,25 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
+      - name: 🐘 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install PHP dependencies
+        run: composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+
+      - name: 📦 Install & build frontend assets
+        run: |
+          npm install
+          npm run build
+
       - name: 📤 Upload files via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -20,7 +39,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          source: .,!.git,!.github,!.gitignore,!.env,!.docker-compose.yml,!.Dockerfile,!.README.md,!.log,!.zip,!.node_modules,
+          source: .,!.git,!.github,!.gitignore,!.env,!.docker-compose.yml,!.Dockerfile,!.README.md,!.log,!.zip,!node_modules,!vendor
           target: 'public_html/subdomains/guidance'
           rm: false
 
@@ -32,10 +51,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            set -e
             cd public_html/subdomains/guidance
-
-            echo "📥 Pull latest code"
-            git pull origin main
 
             echo "📝 Create .env file"
             cat <<EOF > .env
@@ -129,11 +146,6 @@ jobs:
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
             EOF
-
-            echo "📦 Install dependencies"
-            composer install --no-dev --optimize-autoloader
-            npm install
-            npm run build
 
             echo "🔗 Storage link"
             php artisan storage:link || true
