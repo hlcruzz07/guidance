@@ -59,8 +59,8 @@ export default function ActivityLogDetailsDialog({
     log,
 }: Props) {
     if (!log) {
-return null;
-}
+        return null;
+    }
 
     const ActionIcon = actionIcons[log.action] ?? Activity;
 

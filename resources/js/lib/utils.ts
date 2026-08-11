@@ -13,8 +13,8 @@ export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
 }
 export const capitalizeString = (text: string) => {
     if (!text) {
-return '';
-}
+        return '';
+    }
 
     return text
         .toLowerCase()
@@ -25,8 +25,8 @@ return '';
 
 export const uppercaseString = (text: string) => {
     if (!text) {
-return '';
-}
+        return '';
+    }
 
     return text.trim().toUpperCase();
 };
@@ -36,8 +36,8 @@ export const fetchNationalities = async (): Promise<string[]> => {
         const res = await fetch('/nationalities.json');
 
         if (!res.ok) {
-throw new Error('Failed to fetch nationalities');
-}
+            throw new Error('Failed to fetch nationalities');
+        }
 
         const data = await res.json();
 
