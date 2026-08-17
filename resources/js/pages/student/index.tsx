@@ -517,6 +517,23 @@ export default function Index() {
     };
 
     const updateEquityGroupProof = (group: string, file: File | null) => {
+        if (file) {
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+
+            if (!allowedTypes.includes(file.type)) {
+                toast.error('Only JPG, JPEG, and PNG files are allowed.');
+
+                return;
+            }
+
+            if (file.size > maxSizeInBytes) {
+                toast.error('File size must not exceed 5MB.');
+
+                return;
+            }
+        }
+
         setEquityGroupEntries((prev) => ({
             ...prev,
             [group]: {

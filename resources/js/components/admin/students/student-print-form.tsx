@@ -500,9 +500,17 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                         Place of Birth:
                                                     </p>
                                                     <p
-                                                        className={`grow border-b text-center ${student.place_of_birth.length > 25 ? 'text-[10px]' : 'text-xs'} font-bold`}
+                                                        className={`grow border-b text-center ${
+                                                            (student
+                                                                .place_of_birth
+                                                                ?.length ?? 0) >
+                                                            25
+                                                                ? 'text-[10px]'
+                                                                : 'text-xs'
+                                                        } font-bold`}
                                                     >
-                                                        {student.place_of_birth}
+                                                        {student.place_of_birth ||
+                                                            'N/A'}
                                                     </p>
                                                 </div>
                                                 <div className="flex gap-2">
