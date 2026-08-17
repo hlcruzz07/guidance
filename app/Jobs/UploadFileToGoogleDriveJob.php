@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\GoogleDriveService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 
 class UploadFileToGoogleDriveJob implements ShouldQueue
 {
@@ -15,34 +16,45 @@ class UploadFileToGoogleDriveJob implements ShouldQueue
         protected string $campus,
     ) {}
 
-    public function handle(GoogleDriveService $drive): void
-    {
-        foreach ($this->uploads as $upload) {
+   public function handle(GoogleDriveService $drive): void
+{
+    Log::info('UploadFileToGoogleDriveJob started', ['uploads' => count($this->uploads)]);
 
-            if (! file_exists($upload['path'])) {
-                continue;
-            }
+    foreach ($this->uploads as $upload) {
 
-            $modelClass = $upload['model'];
-            $record = $modelClass::find($upload['id']);
-
-            if (! $record) {
-                @unlink($upload['path']);
-
-                continue;
-            }
-
-            $googleDriveId = $drive->uploadFromPath(
-                $upload['path'],
-                $upload['filename'],
-                $this->campus
-            );
-
-            $record->update([
-                $upload['field'] => $googleDriveId,
-            ]);
-
-            @unlink($upload['path']);
+        if (! file_exists($upload['path'])) {
+            Log::warning('Upload file missing, skipping', ['path' => $upload['path']]);
+            continue;
         }
+
+        $modelClass = $upload['model'];
+        $record = $modelClass::find($upload['id']);
+
+        if (! $record) {
+            Log::warning('Record not found, skipping', ['model' => $modelClass, 'id' => $upload['id']]);
+            @unlink($upload['path']);
+            continue;
+        }
+
+        $googleDriveId = $drive->uploadFromPath(
+            $upload['path'],
+            $upload['filename'],
+            $this->campus
+        );
+
+        $updated = $record->update([
+            $upload['field'] => $googleDriveId,
+        ]);
+
+        Log::info('Record updated', [
+            'model' => $modelClass,
+            'id' => $record->id,
+            'field' => $upload['field'],
+            'value' => $googleDriveId,
+            'update_result' => $updated,
+        ]);
+
+        @unlink($upload['path']);
     }
+}
 }

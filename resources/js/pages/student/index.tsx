@@ -516,7 +516,22 @@ export default function Index() {
         });
     };
 
+    const ALLOWED_PROOF_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+    const MAX_PROOF_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+
     const updateEquityGroupProof = (group: string, file: File | null) => {
+        if (file) {
+            if (!ALLOWED_PROOF_TYPES.includes(file.type)) {
+                toast.error('Only JPG, JPEG, or PNG files are allowed.');
+                return;
+            }
+
+            if (file.size > MAX_PROOF_SIZE_BYTES) {
+                toast.error('File size must not exceed 5MB.');
+                return;
+            }
+        }
+
         setEquityGroupEntries((prev) => ({
             ...prev,
             [group]: {
@@ -3332,7 +3347,7 @@ export default function Index() {
                                                             ? `equity_groups.${submittedIndex}.proof`
                                                             : undefined
                                                     }
-                                                    accept=".jpg,.jpeg,.png"
+                                                    accept="image/jpeg,image/jpg,image/png"
                                                     onChange={(e) =>
                                                         updateEquityGroupProof(
                                                             group,
