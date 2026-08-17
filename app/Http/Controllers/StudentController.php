@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\UploadFileToGoogleDriveJob;
-use App\Models\EntityDropdown;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreStudentRequest;
@@ -12,7 +11,7 @@ use App\Repositories\StudentRepo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-
+use Illuminate\Support\Str;
 class StudentController extends Controller
 {
     public function __construct(protected StudentRepo $studentRepo)
@@ -121,6 +120,7 @@ class StudentController extends Controller
         }
     }
 
+
     public function store(StoreStudentRequest $request)
     {
         try {
@@ -134,7 +134,13 @@ class StudentController extends Controller
             $signatureFile = $data['e_signature'] ?? null;
             unset($data['e_signature']);
 
-            DB::transaction(function () use ($data, $signatureFile, &$uploads, &$campus) {
+            $tempDir = storage_path('app/private/temp');
+
+            if (!is_dir($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            DB::transaction(function () use ($data, $signatureFile, &$uploads, &$campus, $tempDir) {
 
                 $student = $this->studentRepo->updateOrCreate($data);
 
@@ -165,26 +171,29 @@ class StudentController extends Controller
                             'proof' => null,
                         ]);
 
-                        $tempPath = $group['proof']->store('temp');
+                        $proofFile = $group['proof'];
+                        $proofFilename = Str::random(40) . '.' . $proofFile->getClientOriginalExtension();
+                        $proofFile->move($tempDir, $proofFilename);
 
                         $uploads[] = [
                             'model' => EquityGroup::class,
                             'id' => $equityGroup->id,
                             'field' => 'proof',
-                            'path' => storage_path("app/private/{$tempPath}"),
-                            'filename' => $group['proof']->getClientOriginalName(),
+                            'path' => $tempDir . DIRECTORY_SEPARATOR . $proofFilename,
+                            'filename' => $proofFile->getClientOriginalName(),
                         ];
                     }
                 }
 
                 if ($signatureFile) {
-                    $tempPath = $signatureFile->store('temp');
+                    $signatureFilename = Str::random(40) . '.' . $signatureFile->getClientOriginalExtension();
+                    $signatureFile->move($tempDir, $signatureFilename);
 
                     $uploads[] = [
                         'model' => Student::class,
                         'id' => $student->id,
                         'field' => 'e_signature',
-                        'path' => storage_path("app/private/{$tempPath}"),
+                        'path' => $tempDir . DIRECTORY_SEPARATOR . $signatureFilename,
                         'filename' => $signatureFile->getClientOriginalName(),
                     ];
                 }

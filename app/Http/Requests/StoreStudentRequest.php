@@ -155,7 +155,7 @@ class StoreStudentRequest extends FormRequest
             // Proof is now required whenever a group entry exists.
             'equity_groups' => ['nullable', 'array'],
             'equity_groups.*.equity_group' => ['required', 'string', 'max:150'],
-            'equity_groups.*.proof' => ['required','image'],
+            'equity_groups.*.proof' => ['required', 'file'],
 
             // ---- V. Psychological Test Records ----
             // Capped to fit the table-fixed layout's hard column widths

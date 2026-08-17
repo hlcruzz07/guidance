@@ -131,7 +131,7 @@ class GoogleDriveService
     }
 
     /**
-     * Download a file to a local path. asdasd
+     * Download a file to a local path.
      */
     public function downloadFileToPath(string $fileId, string $destinationPath): string
     {
@@ -144,8 +144,8 @@ class GoogleDriveService
 
     /**
      * Resolve a file's MIME type purely from its extension.
-     * Deliberately avoids mime_content_type()/finfo since the
-     * fileinfo extension isn't reliably available on all hosts.
+     * Deliberately avoids mime_content_type()/finfo — this server
+     * doesn't have the fileinfo extension (or the finfo class) at all.
      */
     private function resolveMimeType(string $filename): string
     {
