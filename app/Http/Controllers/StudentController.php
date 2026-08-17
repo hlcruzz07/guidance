@@ -137,7 +137,7 @@ class StudentController extends Controller
             $tempDir = storage_path('app/private/temp');
 
             if (!is_dir($tempDir)) {
-                 mkdir($tempDir, 0755, true);
+                mkdir($tempDir, 0755, true);
             }
 
             DB::transaction(function () use ($data, $signatureFile, &$uploads, &$campus, $tempDir) {
