@@ -155,7 +155,7 @@ class StoreStudentRequest extends FormRequest
             // Proof is now required whenever a group entry exists.
             'equity_groups' => ['nullable', 'array'],
             'equity_groups.*.equity_group' => ['required', 'string', 'max:150'],
-            'equity_groups.*.proof' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'equity_groups.*.proof' => ['required','image'],
 
             // ---- V. Psychological Test Records ----
             // Capped to fit the table-fixed layout's hard column widths
@@ -434,8 +434,6 @@ class StoreStudentRequest extends FormRequest
 
             'equity_groups.*.proof.required' => 'Please upload a supporting document or proof for the equity group(s) you selected.',
             'equity_groups.*.proof.file' => 'The uploaded proof must be a valid file.',
-            'equity_groups.*.proof.mimes' => 'The proof file must be a JPG,JPEG, or PNG.',
-            'equity_groups.*.proof.max' => 'The proof file must not be larger than 5MB.',
 
             // ================================================================
             // V. Psychological Test Records
