@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\UploadFileToGoogleDriveJob;
 use App\Models\Student;
+use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreStudentRequest;
 use App\Models\EquityGroup;
@@ -14,9 +15,10 @@ use Inertia\Inertia;
 use Illuminate\Support\Str;
 class StudentController extends Controller
 {
-    public function __construct(protected StudentRepo $studentRepo)
-    {
-
+    public function __construct(
+        protected StudentRepo $studentRepo,
+        protected ImageCompressionService $imageCompressor,
+    ) {
     }
     public function index()
     {
@@ -175,11 +177,14 @@ class StudentController extends Controller
                         $proofFilename = Str::random(40) . '.' . $proofFile->getClientOriginalExtension();
                         $proofFile->move($tempDir, $proofFilename);
 
+                        $proofPath = $tempDir . DIRECTORY_SEPARATOR . $proofFilename;
+                        $this->imageCompressor->compress($proofPath);
+
                         $uploads[] = [
                             'model' => EquityGroup::class,
                             'id' => $equityGroup->id,
                             'field' => 'proof',
-                            'path' => $tempDir . DIRECTORY_SEPARATOR . $proofFilename,
+                            'path' => $proofPath,
                             'filename' => $proofFile->getClientOriginalName(),
                         ];
                     }
@@ -189,11 +194,14 @@ class StudentController extends Controller
                     $signatureFilename = Str::random(40) . '.' . $signatureFile->getClientOriginalExtension();
                     $signatureFile->move($tempDir, $signatureFilename);
 
+                    $signaturePath = $tempDir . DIRECTORY_SEPARATOR . $signatureFilename;
+                    $this->imageCompressor->compress($signaturePath);
+
                     $uploads[] = [
                         'model' => Student::class,
                         'id' => $student->id,
                         'field' => 'e_signature',
-                        'path' => $tempDir . DIRECTORY_SEPARATOR . $signatureFilename,
+                        'path' => $signaturePath,
                         'filename' => $signatureFile->getClientOriginalName(),
                     ];
                 }
