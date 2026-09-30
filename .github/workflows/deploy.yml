@@ -107,7 +107,7 @@ jobs:
             BIN_DB_USERNAME=${{ secrets.BIN_DB_USERNAME }}
             BIN_DB_PASSWORD=${{ secrets.BIN_DB_PASSWORD }}
 
-            OSIS_DB_HOST=${{ secrets.BIN_DBOSIS_DB_HOST_PASSWORD }}
+            OSIS_DB_HOST=${{ secrets.OSIS_DB_HOST }}
             OSIS_DB_PORT=${{ secrets.OSIS_DB_PORT }}
             OSIS_DB_DATABASE=${{ secrets.OSIS_DB_DATABASE }}
             OSIS_DB_USERNAME=${{ secrets.OSIS_DB_USERNAME }}
@@ -157,7 +157,6 @@ jobs:
             EOF
 
             echo "📦 Composer install"
-            vendor/ is uploaded via SCP; just dump the autoloader
             composer dump-autoload --no-dev --optimize 2>/dev/null || true
 
             echo "🔗 Storage link"
