@@ -268,7 +268,33 @@ type ConcernAnswerState = {
     answer: 'Yes' | 'No' | '';
     subAnswer: string;
 };
+const buildOsisEquityGroups = (osis: StudentRecord['osis']) => {
+    if (!osis?.socio_economic_profiles?.length) {
+        return [];
+    }
 
+    const byId = new Map(
+        (osis.socio_economic_categories ?? []).map((c) => [c.id, c]),
+    );
+
+    return osis.socio_economic_profiles.flatMap((profile) => {
+        const category = byId.get(profile.socio_economic_category_id);
+
+        if (!category) {
+            return [];
+        }
+
+        return [
+            {
+                equity_group: category.name,
+                id_number: profile.id_number || null,
+                proof: (profile.proofs ?? [])
+                    .map((p) => p.proof)
+                    .filter(Boolean) as string[], // existing Drive file IDs
+            },
+        ];
+    });
+};
 export default function Index() {
     const { student, osis_socio_economic_categories } =
         usePage<PageProps>().props;
@@ -378,35 +404,13 @@ export default function Index() {
             siblings: [],
             psych_tests: [],
             // Prefill for students who already have an OSIS socio-economic profile
-            equity_groups:
-                student.osis?.socio_economic_profiles?.length &&
-                student.osis?.socio_economic_categories?.length
-                    ? student.osis.socio_economic_profiles
-                          .map((profile) => {
-                              const category =
-                                  student.osis?.socio_economic_categories.find(
-                                      (c) =>
-                                          c.id ===
-                                          profile.socio_economic_category_id,
-                                  );
-
-                              if (!category) {
-                                  return null;
-                              }
-
-                              return {
-                                  equity_group: category.name,
-                                  id_number: profile.id_number || null,
-                                  proof:
-                                      profile.proofs?.map((p) => p.proof) ?? [],
-                              } as unknown as EquityGroup;
-                          })
-                          .filter(
-                              (entry): entry is EquityGroup => entry !== null,
-                          )
-                    : [],
+            equity_groups: buildOsisEquityGroups(
+                student.osis,
+            ) as unknown as EquityGroup[],
             concerns: [],
         });
+
+    console.log(data);
 
     const createEmptyConcernAnswers = (): ConcernAnswerState[] =>
         concerns.map(() => ({ answer: '', subAnswer: '' }));
