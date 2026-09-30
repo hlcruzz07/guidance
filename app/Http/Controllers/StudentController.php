@@ -136,6 +136,7 @@ class StudentController extends Controller
                     'message' => $th->getMessage(),
                 ]);
             }
+            dd($osisStudent);
 
             return Inertia::render('student/index', [
                 'student' => array_merge((array) $student, [
