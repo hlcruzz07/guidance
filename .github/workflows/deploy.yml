@@ -164,7 +164,7 @@ jobs:
 
             echo "⚙️ Laravel setup"
             php artisan migrate --force
-            php artisan db:seed --force
+            # php artisan db:seed --force
 
             echo "🧹 Optimize"
             php artisan config:clear
