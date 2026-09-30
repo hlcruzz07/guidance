@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Encryption\Encrypter;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -53,17 +54,17 @@ class OsisStudentLookup
 
     public function getEconomicCategories(): array
     {
-        return DB::connection(self::CONNECTION)
-            ->table('socio_economic_categories')
-            ->get()
-            ->map(fn($row) => $this->decryptRow(
-                $row,
-                plain: self::SOCIO_ECONOMIC_CATEGORY_PLAIN,
-                table: 'socio_economic_categories',
-            ))
-            ->all();
+        return Cache::remember(
+            'osis:socio_economic_categories',
+            now()->addHour(),
+            fn() =>
+                DB::connection(self::CONNECTION)
+                    ->table('socio_economic_categories')
+                    ->get()
+                    ->map(fn($row) => $this->decryptRow($row, plain: self::SOCIO_ECONOMIC_CATEGORY_PLAIN, table: 'socio_economic_categories'))
+                    ->all()
+        );
     }
-
     private function manyEconomicProfiles(int|string $studentId): array
     {
         $profiles = DB::connection(self::CONNECTION)

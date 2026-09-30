@@ -114,15 +114,35 @@ class StudentController extends Controller
                 return redirect()->route('home')->with('error', 'Only students who are fully enrolled for the current school year (' . now()->year . ') can submit this form.');
             }
 
-            $osis = new OsisStudentLookup;
-            $osisStudent = $osis->findByEmail($email);
+            $osisStudent = null;
+            $osisCategories = [];
+
+            try {
+                $osis = new OsisStudentLookup;
+
+                // Prefer the verified campus email; fall back to the typed one.
+                $osisStudent = $osis->findByEmail($student->email)
+                    ?? $osis->findByEmail($email);
+
+                // Drop the match if it isn't the same person as the campus record.
+                if ($osisStudent && !$this->sameStudent($osisStudent, $student)) {
+                    $osisStudent = null;
+                }
+
+                $osisCategories = $osisStudent['socio_economic_categories']
+                    ?? $osis->getEconomicCategories();
+            } catch (\Throwable $th) {
+                Log::warning('OSIS lookup failed, continuing without it', [
+                    'message' => $th->getMessage(),
+                ]);
+            }
 
             return Inertia::render('student/index', [
                 'student' => array_merge((array) $student, [
                     'campus' => $campus,
                     'osis' => $osisStudent,
                 ]),
-                "osis_socio_economic_categories" => $osis->getEconomicCategories()
+                'osis_socio_economic_categories' => $osisCategories,
             ]);
         } catch (\Throwable $th) {
             Log::error('Student lookup DB connection failed', [
@@ -133,7 +153,11 @@ class StudentController extends Controller
             return redirect()->route('home')->with('error', 'Database connection error. Please try again later.');
         }
     }
-
+    private function sameStudent(array $osis, object $student): bool
+    {
+        return substr((string) ($osis['birthdate'] ?? ''), 0, 10) === substr((string) $student->birthdate, 0, 10)
+            && mb_strtolower(trim((string) ($osis['lname'] ?? ''))) === mb_strtolower(trim((string) $student->student_lastname));
+    }
     public function store(StoreStudentRequest $request)
     {
         try {
