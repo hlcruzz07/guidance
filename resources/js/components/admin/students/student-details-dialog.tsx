@@ -94,12 +94,12 @@ function EmptyState({ label }: { label: string }) {
 
 // Builds a full, browser-loadable URL from a raw Google Drive file id
 // using the getProof Wayfinder route.
-function resolveProofUrl(proof: string | null | undefined): string | null {
-    if (!proof) {
-        return null;
-    }
+function resolveProofUrls(
+    proof: string | string[] | null | undefined,
+): string[] {
+    const ids = Array.isArray(proof) ? proof : proof ? [proof] : [];
 
-    return getProof(proof).url;
+    return ids.filter(Boolean).map((id) => getProof(id).url);
 }
 
 const NAV_ITEMS = [
@@ -159,6 +159,8 @@ export default function StudentDetailsDialog({
     if (!student) {
         return null;
     }
+
+    console.log(student);
 
     const initials = [student.fname?.[0], student.lname?.[0]]
         .filter(Boolean)
@@ -744,64 +746,84 @@ export default function StudentDetailsDialog({
                             </TabsContent>
 
                             {/* EQUITY GROUPS (proof = image, served via getProof) */}
+                            {/* EQUITY GROUPS (proof = array of images, served via getProof) */}
                             <TabsContent
                                 value="equity"
                                 className="m-0 space-y-4 p-4 sm:p-6"
                             >
                                 {student.equity_groups?.length ? (
-                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                                         {student.equity_groups.map((eq, i) => {
-                                            const proofUrl = resolveProofUrl(
+                                            const proofUrls = resolveProofUrls(
                                                 eq.proof,
                                             );
 
                                             return (
-                                                <div
+                                                <SectionCard
                                                     key={eq.id ?? i}
-                                                    className="overflow-hidden rounded-xl border bg-card/50 shadow-sm"
+                                                    title={eq.equity_group}
+                                                    action={
+                                                        <Badge variant="outline">
+                                                            {proofUrls.length}{' '}
+                                                            {proofUrls.length ===
+                                                            1
+                                                                ? 'proof'
+                                                                : 'proofs'}
+                                                        </Badge>
+                                                    }
                                                 >
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            proofUrl &&
-                                                            setPreviewImage({
-                                                                src: proofUrl,
-                                                                label: eq.equity_group,
-                                                            })
-                                                        }
-                                                        disabled={!proofUrl}
-                                                        className="group relative block aspect-video w-full overflow-hidden bg-muted disabled:cursor-default"
-                                                    >
-                                                        {proofUrl ? (
-                                                            <>
-                                                                <img
-                                                                    src={
-                                                                        proofUrl
-                                                                    }
-                                                                    alt={
-                                                                        eq.equity_group
-                                                                    }
-                                                                    className="size-full object-cover transition-transform duration-200 group-hover:scale-105"
-                                                                />
-                                                                <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/40 group-hover:opacity-100">
-                                                                    <ZoomIn className="size-6 text-white drop-shadow" />
-                                                                </div>
-                                                            </>
-                                                        ) : (
-                                                            <div className="flex size-full items-center justify-center text-muted-foreground">
-                                                                <ImageIcon className="size-6" />
-                                                            </div>
-                                                        )}
-                                                    </button>
-                                                    <div className="p-3">
-                                                        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                                                            Equity Group
-                                                        </p>
-                                                        <p className="text-sm font-semibold text-foreground">
-                                                            {eq.equity_group}
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                                    {eq.id_number && (
+                                                        <div className="mb-3">
+                                                            <Field
+                                                                label="ID Number"
+                                                                value={
+                                                                    eq.id_number
+                                                                }
+                                                            />
+                                                        </div>
+                                                    )}
+
+                                                    {proofUrls.length > 0 ? (
+                                                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                                                            {proofUrls.map(
+                                                                (
+                                                                    url,
+                                                                    proofIndex,
+                                                                ) => (
+                                                                    <button
+                                                                        key={`${url}-${proofIndex}`}
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            setPreviewImage(
+                                                                                {
+                                                                                    src: url,
+                                                                                    label: `${eq.equity_group} (${proofIndex + 1} of ${proofUrls.length})`,
+                                                                                },
+                                                                            )
+                                                                        }
+                                                                        className="group relative block aspect-video w-full overflow-hidden rounded-lg border bg-muted"
+                                                                    >
+                                                                        <img
+                                                                            src={
+                                                                                url
+                                                                            }
+                                                                            alt={`${eq.equity_group} proof ${proofIndex + 1}`}
+                                                                            loading="lazy"
+                                                                            className="size-full object-cover transition-transform duration-200 group-hover:scale-105"
+                                                                        />
+                                                                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/40 group-hover:opacity-100">
+                                                                            <ZoomIn className="size-5 text-white drop-shadow" />
+                                                                        </div>
+                                                                    </button>
+                                                                ),
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex h-24 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
+                                                            <ImageIcon className="size-5" />
+                                                        </div>
+                                                    )}
+                                                </SectionCard>
                                             );
                                         })}
                                     </div>

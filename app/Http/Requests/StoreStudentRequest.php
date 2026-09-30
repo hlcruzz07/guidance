@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 
 class StoreStudentRequest extends FormRequest
 {
@@ -152,10 +153,18 @@ class StoreStudentRequest extends FormRequest
             'siblings.*.is_employed' => ['nullable', 'boolean'],
 
             // ---- IV. Equity Target Group Affiliation ----
-            // Proof is now required whenever a group entry exists.
+            // Proof is required whenever a group entry exists (either a new file upload or an existing Google Drive ID).
             'equity_groups' => ['nullable', 'array'],
             'equity_groups.*.equity_group' => ['required', 'string', 'max:150'],
-            'equity_groups.*.proof' => ['required', 'file'],
+            'equity_groups.*.id_number' => ['nullable', 'string', 'max:100'],
+            'equity_groups.*.proof' => [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! $value instanceof UploadedFile && ! is_string($value) && ! is_array($value)) {
+                        $fail('The uploaded proof must be a valid file or document ID.');
+                    }
+                },
+            ],
 
             // ---- V. Psychological Test Records ----
             // Capped to fit the table-fixed layout's hard column widths

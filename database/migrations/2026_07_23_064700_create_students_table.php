@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\StudentType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -22,7 +21,7 @@ return new class extends Migration {
             $table->string('suffix')->nullable();
             $table->string('email')->unique();
             $table->string('phone')->nullable();
-            $table->enum('type', [StudentType::FRESHMEN, StudentType::TRANSFEREE, StudentType::SHIFTEE, StudentType::RETURNEE])->default(StudentType::FRESHMEN);
+            $table->string('type');
             $table->string('course');
             $table->string('year_level');
             $table->string('section');

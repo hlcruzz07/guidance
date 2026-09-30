@@ -18,7 +18,6 @@ export default function StudentSIIPrintForm({ student }: Props) {
         financers,
         houseMonthlyIncomes,
         natureResidence,
-        equityGroups,
         concerns,
     } = useDropdowns();
 
@@ -260,7 +259,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                         {studentTypes.map(
                                                             (item: string) => (
                                                                 <label className="flex items-center gap-2">
-                                                                    <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                    <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                         {student.type ===
                                                                             item && (
                                                                             <CheckIcon
@@ -327,7 +326,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                     key={item}
                                                                     className="flex items-center gap-2"
                                                                 >
-                                                                    <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                    <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                         {student.gender ===
                                                                             item && (
                                                                             <CheckIcon
@@ -390,7 +389,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                     key={item}
                                                                     className="flex items-center gap-2"
                                                                 >
-                                                                    <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                    <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                         {student.sexual_orientation ===
                                                                             item && (
                                                                             <CheckIcon
@@ -424,7 +423,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                 student.sexual_orientation,
                                                             ) && (
                                                                 <label className="flex items-center gap-2">
-                                                                    <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                    <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                         <CheckIcon
                                                                             size={
                                                                                 8
@@ -608,7 +607,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                         }
                                                                         className="flex items-center gap-2"
                                                                     >
-                                                                        <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                        <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                             {checked && (
                                                                                 <CheckIcon
                                                                                     size={
@@ -974,7 +973,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                     key={item}
                                                                     className="flex items-center gap-2"
                                                                 >
-                                                                    <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                    <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                         {student.parent_marital_relationship ===
                                                                             item && (
                                                                             <CheckIcon
@@ -1008,7 +1007,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                 student.parent_marital_relationship,
                                                             ) && (
                                                                 <label className="flex items-center gap-2">
-                                                                    <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                    <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                         <CheckIcon
                                                                             size={
                                                                                 8
@@ -1071,7 +1070,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                     key={item}
                                                                     className="flex items-center gap-2"
                                                                 >
-                                                                    <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                    <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                         {student.financer ===
                                                                             item && (
                                                                             <CheckIcon
@@ -1105,7 +1104,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                 student.financer,
                                                             ) && (
                                                                 <label className="flex items-center gap-2">
-                                                                    <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                    <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                         <CheckIcon
                                                                             size={
                                                                                 8
@@ -1145,74 +1144,6 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                             : 'N/A'}
                                                     </p>
                                                 </div>
-                                                <div>
-                                                    <p className="text-xs">
-                                                        Household/Family Income:
-                                                    </p>
-
-                                                    <table className="table-auto border-collapse self-start border text-start">
-                                                        <thead>
-                                                            <tr className="[&>th]:border! [&>th]:p-0! [&>th]:align-top [&>th]:text-xs! [&>th]:leading-tight [&>th]:font-bold!">
-                                                                <th>MONTHLY</th>
-                                                                <th>
-                                                                    ANNUAL
-                                                                    EQUIVALENT
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {houseMonthlyIncomes.map(
-                                                                (
-                                                                    item: any,
-                                                                    i: number,
-                                                                ) => {
-                                                                    const checked =
-                                                                        student.household_income ===
-                                                                        item.monthly;
-
-                                                                    return (
-                                                                        <tr
-                                                                            key={
-                                                                                i
-                                                                            }
-                                                                            className="[&>td]:border [&>td]:p-0.5! [&>td]:px-1! [&>td]:align-top [&>td]:text-xs! [&>td]:leading-tight [&>td]:font-bold"
-                                                                        >
-                                                                            <td>
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <span className="flex h-2.5 w-2.5 shrink-0 items-center justify-center border border-black text-xs">
-                                                                                        {checked && (
-                                                                                            <CheckIcon
-                                                                                                size={
-                                                                                                    8
-                                                                                                }
-                                                                                                strokeWidth={
-                                                                                                    5
-                                                                                                }
-                                                                                                className="shrink-0"
-                                                                                            />
-                                                                                        )}
-                                                                                    </span>
-
-                                                                                    <span>
-                                                                                        {
-                                                                                            item.monthly
-                                                                                        }
-                                                                                    </span>
-                                                                                </div>
-                                                                            </td>
-
-                                                                            <td>
-                                                                                {
-                                                                                    item.annual
-                                                                                }
-                                                                            </td>
-                                                                        </tr>
-                                                                    );
-                                                                },
-                                                            )}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1231,6 +1162,71 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                     <div className="space-y-2">
                                         <div>
                                             <p className="text-xs">
+                                                Household/Family Income:
+                                            </p>
+
+                                            <table className="table-auto border-collapse self-start border text-start">
+                                                <thead>
+                                                    <tr className="[&>th]:border! [&>th]:p-0! [&>th]:align-top [&>th]:text-xs! [&>th]:leading-tight [&>th]:font-bold!">
+                                                        <th>MONTHLY</th>
+                                                        <th>
+                                                            ANNUAL EQUIVALENT
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {houseMonthlyIncomes.map(
+                                                        (
+                                                            item: any,
+                                                            i: number,
+                                                        ) => {
+                                                            const checked =
+                                                                student.household_income ===
+                                                                item.monthly;
+
+                                                            return (
+                                                                <tr
+                                                                    key={i}
+                                                                    className="[&>td]:border [&>td]:p-0.5! [&>td]:px-1! [&>td]:align-top [&>td]:text-xs! [&>td]:leading-tight [&>td]:font-bold"
+                                                                >
+                                                                    <td>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
+                                                                                {checked && (
+                                                                                    <CheckIcon
+                                                                                        size={
+                                                                                            8
+                                                                                        }
+                                                                                        strokeWidth={
+                                                                                            5
+                                                                                        }
+                                                                                        className="shrink-0"
+                                                                                    />
+                                                                                )}
+                                                                            </span>
+
+                                                                            <span>
+                                                                                {
+                                                                                    item.monthly
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {
+                                                                            item.annual
+                                                                        }
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        },
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs">
                                                 Nature of residence while
                                                 attending school:
                                             </p>
@@ -1242,7 +1238,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                             key={item}
                                                             className="flex items-center gap-2"
                                                         >
-                                                            <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                            <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                 {student.nature_of_residence ===
                                                                     item && (
                                                                     <CheckIcon
@@ -1274,13 +1270,13 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                         student.nature_of_residence,
                                                     ) && (
                                                         <label className="flex items-center gap-2">
-                                                            <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                            <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                 <CheckIcon
                                                                     size={8}
                                                                     strokeWidth={
-                                                                        5
+                                                                        4
                                                                     }
-                                                                    className="shrink-0"
+                                                                    className="block shrink-0"
                                                                 />
                                                             </span>
 
@@ -1306,7 +1302,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                     IV.
                                 </div>
                                 <div>
-                                    <div>
+                                    <div className="mb-4">
                                         <h1 className="text-xs font-bold">
                                             EQUITY TARGET GROUP AFFILIATION
                                         </h1>
@@ -1334,30 +1330,31 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {equityGroups.map(
-                                                (item: string, i: number) => {
-                                                    const match =
-                                                        student.equity_groups?.find(
-                                                            (g) =>
-                                                                g.equity_group ===
-                                                                    item ||
-                                                                g.equity_group.startsWith(
-                                                                    `${item} - `,
-                                                                ),
-                                                        );
-                                                    const checked = !!match;
-                                                    const hasProof =
-                                                        !!match?.proof;
+                                            {student.equity_groups?.length ? (
+                                                student.equity_groups.map(
+                                                    (eq, i) => {
+                                                        // `proof` is an array of Drive IDs (legacy rows may be a string).
+                                                        const proofCount =
+                                                            Array.isArray(
+                                                                eq.proof,
+                                                            )
+                                                                ? eq.proof.filter(
+                                                                      Boolean,
+                                                                  ).length
+                                                                : eq.proof
+                                                                  ? 1
+                                                                  : 0;
+                                                        const hasProof =
+                                                            proofCount > 0;
 
-                                                    return (
-                                                        <tr
-                                                            key={i}
-                                                            className="[&>td]:border [&>td]:p-0.5! [&>td]:px-1! [&>td]:align-top [&>td]:text-xs! [&>td]:leading-tight [&>td]:font-bold"
-                                                        >
-                                                            <td>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="flex h-2.5 w-2.5 shrink-0 items-center justify-center border border-black text-xs">
-                                                                        {checked && (
+                                                        return (
+                                                            <tr
+                                                                key={eq.id ?? i}
+                                                                className="[&>td]:border [&>td]:p-0.5! [&>td]:px-1! [&>td]:align-top [&>td]:text-xs! [&>td]:leading-tight [&>td]:font-bold"
+                                                            >
+                                                                <td>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                             <CheckIcon
                                                                                 size={
                                                                                     8
@@ -1367,36 +1364,43 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                                 }
                                                                                 className="shrink-0"
                                                                             />
-                                                                        )}
-                                                                    </span>
+                                                                        </span>
 
-                                                                    <span>
-                                                                        {item}
-                                                                        {match &&
-                                                                            match.equity_group !==
-                                                                                item && (
-                                                                                <>
-                                                                                    {
-                                                                                        ' - '
-                                                                                    }
-                                                                                    {match.equity_group.replace(
-                                                                                        `${item} - `,
-                                                                                        '',
-                                                                                    )}
-                                                                                </>
+                                                                        <span>
+                                                                            {
+                                                                                eq.equity_group
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td className="text-center align-middle!">
+                                                                    {(hasProof ||
+                                                                        eq.id_number) && (
+                                                                        <span className="inline-flex flex-col items-center justify-center gap-0.5">
+                                                                            {eq.id_number && (
+                                                                                <span className="text-[10px]">
+                                                                                    ID
+                                                                                    No.:{' '}
+                                                                                    {eq.id_number.toUpperCase()}
+                                                                                </span>
                                                                             )}
-                                                                    </span>
-                                                                </div>
-                                                            </td>
-
-                                                            <td className="text-center align-middle!">
-                                                                {hasProof && (
-                                                                    <CheckIcon className="mx-auto size-3" />
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                },
+                                                                        </span>
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    },
+                                                )
+                                            ) : (
+                                                <tr>
+                                                    <td
+                                                        colSpan={2}
+                                                        className="p-1 text-center text-xs font-bold"
+                                                    >
+                                                        N/A
+                                                    </td>
+                                                </tr>
                                             )}
                                         </tbody>
                                     </table>
@@ -1408,7 +1412,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                     V.
                                 </div>
                                 <div>
-                                    <h1 className="text-xs font-bold">
+                                    <h1 className="mb-4 text-xs font-bold">
                                         PSYCHOLOGICAL TEST RESULT
                                     </h1>
 
@@ -1511,7 +1515,7 @@ export default function StudentSIIPrintForm({ student }: Props) {
                                                                             }
                                                                             className="inline-flex items-center gap-1"
                                                                         >
-                                                                            <span className="flex h-2.5 w-2.5 items-center justify-center border border-black text-xs">
+                                                                            <span className="box-border flex size-[11px] shrink-0 items-center justify-center border border-black leading-none">
                                                                                 {baseAnswer ===
                                                                                     option && (
                                                                                     <CheckIcon

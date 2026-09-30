@@ -28,11 +28,13 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { studentForm } from '@/routes';
+import { email } from '@/routes/password';
 
 type ValidateForm = {
     id_number: string;
     campus: string;
     birthdate: string;
+    email: string;
 };
 export type FlashMessages = {
     success?: string | null;
@@ -51,6 +53,7 @@ export default function Welcome() {
         id_number: '',
         campus: '',
         birthdate: '',
+        email: '',
     });
     const message =
         flash.success || flash.error || flash.info || flash.warning || null;
@@ -216,6 +219,27 @@ export default function Welcome() {
                                 />
                                 {errors.id_number && (
                                     <FieldError>{errors.id_number}</FieldError>
+                                )}
+                            </Field>
+                            <Field>
+                                <FieldLabel htmlFor="email">
+                                    Email Address
+                                </FieldLabel>
+                                <Input
+                                    type="email"
+                                    id="email"
+                                    value={data.email}
+                                    onChange={(e) =>
+                                        setData(
+                                            'email',
+                                            String(e.target.value).trim(),
+                                        )
+                                    }
+                                    aria-invalid={!!errors.email}
+                                    placeholder="Enter your email"
+                                />
+                                {errors.email && (
+                                    <FieldError>{errors.email}</FieldError>
                                 )}
                             </Field>
 

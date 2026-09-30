@@ -10,45 +10,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/form', [StudentController::class, 'form'])->name('studentForm');
 Route::post('/form/store', [StudentController::class, 'store'])->name('storeStudent');
 
-// Guest Routes asdasdasd adasdasd asd
 Route::middleware('guest')->group(function () {
     Route::inertia('/', 'welcome')->name('home');
     Route::get('/admin', [AdminController::class, 'index'])->name('admin');
-
-});
-
-Route::get('/db-check', function () {
-    $connections = [
-        'Talisay' => 'tal_mysql',
-        'Alijis' => 'ali_mysql',
-        'Fortune Towne' => 'ft_mysql',
-        'Binalbagan' => 'bin_mysql',
-    ];
-
-    $results = [];
-
-    foreach ($connections as $campus => $connection) {
-        try {
-            DB::connection($connection)->getPdo();
-
-            $results[$campus] = [
-                'connection' => $connection,
-                'status' => 'Connected',
-                'message' => 'Database connection successful.',
-            ];
-        } catch (\Throwable $e) {
-            $results[$campus] = [
-                'connection' => $connection,
-                'status' => 'Failed',
-                'message' => $e->getMessage(),
-            ];
-        }
-    }
-
-    return response()->json([
-        'status' => 'complete',
-        'databases' => $results,
-    ]);
 });
 
 Route::get('/auth/google/redirect', [AdminController::class, 'redirect'])->name('googleRedirect');
@@ -72,4 +36,4 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     });
 });
 
-require __DIR__ . '/api.php';
+require __DIR__.'/api.php';

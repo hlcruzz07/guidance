@@ -84,3 +84,16 @@ export const normalizeName = (name: string) => {
         .replace(/_/g, ' ')
         .replace(/\b\w/g, (char) => char.toUpperCase());
 };
+export function getCookie(name: string): string | null {
+    const match = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith(`${name}=`));
+
+    return match ? decodeURIComponent(match.split('=')[1]) : null;
+}
+export function setCookie(name: string, value: string, days: number) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+}

@@ -2,8 +2,10 @@ import { useForm, usePage } from '@inertiajs/react';
 import {
     Asterisk,
     Check,
+    CheckCheck,
     ChevronsUpDown,
     CopyCheck,
+    ImagePlus,
     MailIcon,
     PhoneIcon,
     Plus,
@@ -11,7 +13,9 @@ import {
     SendIcon,
     Star,
     Trash2,
+    TriangleAlert,
     WeightIcon,
+    X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -19,6 +23,15 @@ import SignatureModal from '@/components/student/SignaturePad';
 import { SubmittingDialog } from '@/components/student/SubmittingDialog';
 
 import ThemeButton from '@/components/ThemeButton';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -39,6 +52,7 @@ import {
     FieldSet,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
     Popover,
     PopoverContent,
@@ -70,7 +84,9 @@ import { useDropdowns } from '@/hooks/use-dropdowns';
 import {
     capitalizeString,
     fetchNationalities,
+    getCookie,
     handleErrors,
+    setCookie,
 } from '@/lib/utils';
 import { storeStudent } from '@/routes';
 
@@ -78,6 +94,7 @@ import type {
     EquityGroup,
     Guardian,
     PsychTest,
+    SocioEconomicCategory,
     Student,
     StudentRecord,
 } from '@/types/entities';
@@ -88,6 +105,7 @@ type StudentForm = Omit<
 >;
 type PageProps = {
     student: StudentRecord;
+    osis_socio_economic_categories: SocioEconomicCategory[];
 };
 
 type EducationLevel =
@@ -122,6 +140,26 @@ const createEmptyEducationEntry = (
     school_type: '',
     honor_received: null,
 });
+
+const normalizeSchoolType = (
+    type?: string | null,
+): 'Public' | 'Private' | '' => {
+    if (!type) {
+        return '';
+    }
+
+    const trimmed = type.trim().toLowerCase();
+
+    if (trimmed === 'public') {
+        return 'Public';
+    }
+
+    if (trimmed === 'private') {
+        return 'Private';
+    }
+
+    return '';
+};
 
 // ---- Home & Family Background types ----
 
@@ -182,14 +220,18 @@ const createEmptySiblingEntry = (): SiblingEntry => ({
 
 // ---- Equity Target Group Affiliation types ----
 
-const SOLO_PARENT_CHILD_GROUP =
-    'Child of a Solo Parent (Living with Mother or Father)';
-
 type EquityGroupEntry = {
-    group: string;
-    proof: File | null;
-    living_with?: 'Mother' | 'Father' | '';
+    category_id: number;
+    code: string;
+    group: string; // category display name
+    proofs: File[]; // multiple proofs, stored in EquityGroup.proof (array cast)
+    id_number: string;
 };
+
+const WARNING_COOKIE = 'osis_hide_socioeconomic_warning';
+const WARNING_COOKIE_DAYS = 4;
+const ALLOWED_PROOF_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
+const MAX_PROOF_SIZE_BYTES = 5 * 1024 * 1024; // 5MB per file
 
 // ---- Psychological Test Records types ----
 
@@ -228,7 +270,8 @@ type ConcernAnswerState = {
 };
 
 export default function Index() {
-    const { student } = usePage<PageProps>().props;
+    const { student, osis_socio_economic_categories } =
+        usePage<PageProps>().props;
 
     const flash: any = usePage().props.flash || {};
 
@@ -267,11 +310,11 @@ export default function Index() {
         maritalRelationships,
         financers,
         houseMonthlyIncomes,
-        equityGroups,
         natureResidence,
         concerns,
         highestEducationalAttainments,
     } = useDropdowns();
+
     const { data, setData, processing, post, errors, progress } =
         useForm<StudentForm>({
             id_number: '',
@@ -285,14 +328,14 @@ export default function Index() {
             email: '',
             phone: '',
 
-            type: '',
+            type: student.osis?.entry_status || '',
             course: '',
             year_level: null,
             section: '',
 
             gender: '',
             civil_status: '',
-            sexual_orientation: '',
+            sexual_orientation: student.osis?.sexual_orientation || '',
 
             height: null,
             weight: null,
@@ -302,7 +345,11 @@ export default function Index() {
             date_of_birth: '',
             place_of_birth: '',
 
-            last_school_attended: '',
+            last_school_attended: student.osis?.c_name
+                ? capitalizeString(student.osis.c_name)
+                : student.osis?.shs_name
+                  ? capitalizeString(student.osis.shs_name)
+                  : '',
 
             current_address: '',
             home_address: '',
@@ -330,7 +377,34 @@ export default function Index() {
             educations: [],
             siblings: [],
             psych_tests: [],
-            equity_groups: [],
+            // Prefill for students who already have an OSIS socio-economic profile
+            equity_groups:
+                student.osis?.socio_economic_profiles?.length &&
+                student.osis?.socio_economic_categories?.length
+                    ? student.osis.socio_economic_profiles
+                          .map((profile) => {
+                              const category =
+                                  student.osis?.socio_economic_categories.find(
+                                      (c) =>
+                                          c.id ===
+                                          profile.socio_economic_category_id,
+                                  );
+
+                              if (!category) {
+                                  return null;
+                              }
+
+                              return {
+                                  equity_group: category.name,
+                                  id_number: profile.id_number || null,
+                                  proof:
+                                      profile.proofs?.map((p) => p.proof) ?? [],
+                              } as unknown as EquityGroup;
+                          })
+                          .filter(
+                              (entry): entry is EquityGroup => entry !== null,
+                          )
+                    : [],
             concerns: [],
         });
 
@@ -339,7 +413,7 @@ export default function Index() {
 
     const [selectedSexualOrientation, setSelectedSexualOrientation] = useState<
         string | null
-    >(null);
+    >(student.osis?.sexual_orientation || null);
     const [selectedFinancer, setSelectedFinancer] = useState<string | null>(
         null,
     );
@@ -370,6 +444,12 @@ export default function Index() {
         }
     }, [dataPrivacyConsent]);
     // Educational Background state
+    const hasOsisCollege = Boolean(
+        student.osis?.c_name || student.osis?.c_year || student.osis?.c_type,
+    );
+    const [includeCollege, setIncludeCollege] = useState(hasOsisCollege);
+    const [includeVocational, setIncludeVocational] = useState(false);
+
     const [educationEntries, setEducationEntries] = useState<
         Record<EducationLevel, EducationEntry>
     >(() => {
@@ -379,10 +459,40 @@ export default function Index() {
                 createEmptyEducationEntry(education_level);
         });
 
+        if (
+            student.osis?.shs_name ||
+            student.osis?.shs_year ||
+            student.osis?.shs_type
+        ) {
+            entries['Senior High School'] = {
+                education_level: 'Senior High School',
+                school_name: student.osis.shs_name
+                    ? capitalizeString(student.osis.shs_name)
+                    : '',
+                year_covered: '',
+                school_type: normalizeSchoolType(student.osis.shs_type),
+                honor_received: null,
+            };
+        }
+
+        if (
+            student.osis?.c_name ||
+            student.osis?.c_year ||
+            student.osis?.c_type
+        ) {
+            entries['College'] = {
+                education_level: 'College',
+                school_name: student.osis.c_name
+                    ? capitalizeString(student.osis.c_name)
+                    : '',
+                year_covered: '',
+                school_type: normalizeSchoolType(student.osis.c_type),
+                honor_received: null,
+            };
+        }
+
         return entries;
     });
-    const [includeCollege, setIncludeCollege] = useState(false);
-    const [includeVocational, setIncludeVocational] = useState(false);
 
     const visibleEducationLevels = useMemo(() => {
         return EDUCATION_LEVELS_ORDER.filter((education_level) => {
@@ -491,62 +601,118 @@ export default function Index() {
         );
     };
 
+    // True once we know the student already has a socio-economic profile on
+    // file in OSIS — in that case we skip the section entirely.
+    const hasExistingSocioEconomicProfile =
+        (student.osis?.socio_economic_profiles?.length ?? 0) > 0;
+
+    const socioEconomicCategories: SocioEconomicCategory[] =
+        student.osis?.socio_economic_categories ??
+        osis_socio_economic_categories;
+
     // Equity Target Group Affiliation state
     const [equityGroupEntries, setEquityGroupEntries] = useState<
         Record<string, EquityGroupEntry>
     >({});
+    const [isUploadWarningOpen, setIsUploadWarningOpen] = useState(false);
+    const [dontShowAgain, setDontShowAgain] = useState(false);
 
-    const toggleEquityGroup = (group: string, checked: boolean) => {
+    useEffect(() => {
+        if (hasExistingSocioEconomicProfile || getCookie(WARNING_COOKIE)) {
+            return;
+        }
+
+        const timeoutId = window.setTimeout(
+            () => setIsUploadWarningOpen(true),
+            0,
+        );
+
+        return () => window.clearTimeout(timeoutId);
+    }, [hasExistingSocioEconomicProfile]);
+
+    const handleAcknowledgeWarning = () => {
+        if (dontShowAgain) {
+            setCookie(WARNING_COOKIE, '1', WARNING_COOKIE_DAYS);
+        }
+
+        setIsUploadWarningOpen(false);
+    };
+
+    const toggleEquityGroup = (
+        category: SocioEconomicCategory,
+        checked: boolean,
+    ) => {
         setEquityGroupEntries((prev) => {
             const next = { ...prev };
 
             if (checked) {
-                next[group] = {
-                    group,
-                    proof: null,
-                    ...(group === SOLO_PARENT_CHILD_GROUP
-                        ? { living_with: '' }
-                        : {}),
+                next[category.code] = {
+                    category_id: category.id,
+                    code: category.code,
+                    group: category.name,
+                    proofs: [],
+                    id_number: '',
                 };
             } else {
-                delete next[group];
+                delete next[category.code];
             }
 
             return next;
         });
     };
 
-    const ALLOWED_PROOF_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
-    const MAX_PROOF_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+    const addEquityGroupProofs = (code: string, fileList: FileList | null) => {
+        if (!fileList) {
+            return;
+        }
 
-    const updateEquityGroupProof = (group: string, file: File | null) => {
-        if (file) {
+        const validFiles: File[] = [];
+
+        for (const file of Array.from(fileList)) {
             if (!ALLOWED_PROOF_TYPES.includes(file.type)) {
-                toast.error('Only JPG, JPEG, or PNG files are allowed.');
-                return;
+                toast.error(
+                    `"${file.name}" is not supported. Only JPG, JPEG, and PNG images are allowed.`,
+                );
+                continue;
             }
 
             if (file.size > MAX_PROOF_SIZE_BYTES) {
-                toast.error('File size must not exceed 5MB.');
-                return;
+                toast.error(`"${file.name}" exceeds the 5MB size limit.`);
+                continue;
             }
+
+            validFiles.push(file);
+        }
+
+        if (validFiles.length === 0) {
+            return;
         }
 
         setEquityGroupEntries((prev) => ({
             ...prev,
-            [group]: {
-                ...prev[group],
-                proof: file,
+            [code]: {
+                ...prev[code],
+                proofs: [...(prev[code]?.proofs ?? []), ...validFiles],
             },
         }));
     };
 
-    const updateEquityGroupLivingWith = (group: string, value: string) => {
+    const removeEquityGroupProof = (code: string, index: number) => {
         setEquityGroupEntries((prev) => ({
             ...prev,
-            [group]: {
-                ...prev[group],
-                living_with: value as 'Mother' | 'Father',
+            [code]: {
+                ...prev[code],
+                proofs: prev[code].proofs.filter((_, i) => i !== index),
+            },
+        }));
+    };
+
+    const updateEquityGroupIdNumber = (code: string, value: string) => {
+        setEquityGroupEntries((prev) => ({
+            ...prev,
+            [code]: {
+                ...prev[code],
+                id_number: value,
             },
         }));
     };
@@ -633,6 +799,11 @@ export default function Index() {
                 contact_person_address: student.person_notify_address ?? '',
                 contact_person_mobile_um:
                     student.person_notify_cellphone?.toString() ?? '',
+                last_school_attended: student.osis?.c_name
+                    ? capitalizeString(student.osis.c_name)
+                    : student.osis?.shs_name
+                      ? capitalizeString(student.osis.shs_name)
+                      : prev.last_school_attended,
             }));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -664,18 +835,51 @@ export default function Index() {
 
     // Keep data.equity_groups in sync with the selected equity groups
     useEffect(() => {
-        const list: Partial<EquityGroup>[] = Object.values(
-            equityGroupEntries,
-        ).map((entry) => ({
-            equity_group:
-                entry.group === SOLO_PARENT_CHILD_GROUP && entry.living_with
-                    ? `${entry.group} - ${entry.living_with}`
-                    : entry.group,
-            proof: entry.proof as any,
+        if (hasExistingSocioEconomicProfile) {
+            return;
+        }
+
+        const list = Object.values(equityGroupEntries).map((entry) => ({
+            equity_group: entry.group,
+            id_number: entry.id_number || null,
+            proof: entry.proofs as any,
         }));
         setData('equity_groups', list as any[]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [equityGroupEntries]);
+    }, [equityGroupEntries, hasExistingSocioEconomicProfile]);
+
+    // If the student already has a socio-economic profile in OSIS, pull it
+    // in and skip letting them fill the section out again.
+    useEffect(() => {
+        if (!hasExistingSocioEconomicProfile || !student.osis) {
+            return;
+        }
+
+        const categoriesById = new Map(
+            student.osis.socio_economic_categories.map((c) => [c.id, c]),
+        );
+
+        const list: EquityGroup[] = student.osis.socio_economic_profiles
+            .map((profile) => {
+                const category = categoriesById.get(
+                    profile.socio_economic_category_id,
+                );
+
+                if (!category) {
+                    return null;
+                }
+
+                return {
+                    equity_group: category.name,
+                    id_number: profile.id_number || null,
+                    proof: profile.proofs?.map((p) => p.proof) ?? [],
+                } as unknown as EquityGroup;
+            })
+            .filter((entry): entry is EquityGroup => entry !== null);
+
+        setData('equity_groups', list as any[]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasExistingSocioEconomicProfile]);
 
     // Keep data.psych_tests in sync with the psych tests list
     useEffect(() => {
@@ -748,6 +952,35 @@ export default function Index() {
         }
 
         setSubAnswerErrors({});
+
+        // Equity groups: each checked group needs its ID number (when
+        // required) and at least one supporting image.
+        if (!hasExistingSocioEconomicProfile) {
+            const invalidEntry = Object.values(equityGroupEntries).find(
+                (entry) => {
+                    const category = socioEconomicCategories.find(
+                        (c) => c.code === entry.code,
+                    );
+
+                    return (
+                        (!!category?.with_id && !entry.id_number.trim()) ||
+                        entry.proofs.length === 0
+                    );
+                },
+            );
+
+            if (invalidEntry) {
+                toast.error(
+                    'Please provide the ID number (if required) and at least one supporting image for each selected group.',
+                );
+
+                document
+                    .getElementById(`equity_${invalidEntry.code}`)
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                return;
+            }
+        }
 
         post(storeStudent().url, {
             preserveScroll: true,
@@ -1050,7 +1283,6 @@ export default function Index() {
                                         capitalizeString(e.target.value),
                                     )
                                 }
-
                                 placeholder="Enter place of birth"
                             />
                             {errors['place_of_birth'] && (
@@ -1469,10 +1701,6 @@ export default function Index() {
                                             'contact_person',
                                             capitalizeString(e.target.value),
                                         );
-                                        setData(
-                                            'contact_person',
-                                            capitalizeString(e.target.value),
-                                        );
                                     }}
                                     aria-invalid={!!errors['contact_person']}
                                     placeholder="Enter contact person"
@@ -1535,6 +1763,9 @@ export default function Index() {
                                         }
                                         disabled={
                                             !!student.person_notify_cellphone
+                                        }
+                                        aria-invalid={
+                                            !!errors['contact_person_mobile_um']
                                         }
                                         id="contact_person_mobile_um"
                                         onChange={(e) => {
@@ -3185,90 +3416,165 @@ export default function Index() {
                         )}
                     </FieldGroup>
                 </FieldSet>
-                <FieldSet>
-                    <FieldLegend>
-                        IV. Equity Target Group Affiliation
-                    </FieldLegend>
-                    <FieldDescription>
-                        DO YOU BELONG TO THE FOLLOWING GROUP? If YES, please
-                        CHECK (☑) the box(es) corresponding to the group(s) you
-                        belong to and upload the required supporting document or
-                        proof (e.g., Identification Card, Certificate of
-                        Membership, Barangay Certification, Tax Exemption
-                        Certificate, or another applicable government-issued
-                        certification/issuance).
-                    </FieldDescription>
 
-                    <FieldGroup>
-                        {equityGroups.map((group: string) => {
-                            const entry = equityGroupEntries[group];
-                            const isChecked = !!entry;
+                {!hasExistingSocioEconomicProfile && (
+                    <FieldSet>
+                        <FieldLegend>
+                            IV. Equity Target Group Affiliation
+                        </FieldLegend>
+                        <FieldDescription>
+                            DO YOU BELONG TO THE FOLLOWING GROUP? If YES, please
+                            CHECK (☑) the box(es) corresponding to the group(s)
+                            you belong to and upload the required supporting
+                            document(s) or proof (e.g., Identification Card,
+                            Certificate of Membership, Barangay Certification,
+                            Tax Exemption Certificate, or another applicable
+                            government-issued certification/issuance). You may
+                            upload multiple images (JPG, JPEG, or PNG, max 5MB
+                            each).
+                        </FieldDescription>
 
-                            const submittedIndex =
-                                data.equity_groups?.findIndex((item) => {
-                                    if (!item.equity_group) {
-                                        return false;
-                                    }
+                        <FieldGroup>
+                            {socioEconomicCategories.map((category) => {
+                                const entry = equityGroupEntries[category.code];
+                                const isChecked = !!entry;
 
-                                    return (
-                                        item.equity_group === group ||
-                                        item.equity_group.startsWith(group)
-                                    );
-                                }) ?? -1;
+                                const submittedIndex =
+                                    data.equity_groups?.findIndex(
+                                        (item) =>
+                                            !!item.equity_group &&
+                                            item.equity_group === category.name,
+                                    ) ?? -1;
 
-                            const hasIndex = submittedIndex !== -1;
+                                const hasIndex = submittedIndex !== -1;
+                                const idKey = `equity_groups.${submittedIndex}.id_number`;
+                                const proofKey = `equity_groups.${submittedIndex}.proof`;
 
-                            return (
-                                <div
-                                    key={group}
-                                    onClick={(e) => {
-                                        const target = e.target as HTMLElement;
-
-                                        if (
-                                            target.closest(
-                                                '[data-checkbox-toggle]',
-                                            ) ||
-                                            target.closest(
-                                                '[data-stop-card-toggle]',
-                                            )
-                                        ) {
-                                            return;
-                                        }
-
-                                        toggleEquityGroup(group, !isChecked);
-                                    }}
-                                    className={`cursor-pointer space-y-3 rounded-lg border p-4 transition-all ${
-                                        isChecked
-                                            ? 'border-primary bg-primary/5'
-                                            : 'border-border'
-                                    }`}
-                                >
+                                return (
                                     <div
-                                        data-checkbox-toggle
-                                        className="flex items-start gap-3"
-                                    >
-                                        <Checkbox
-                                            id={`equity_${group}`}
-                                            checked={isChecked}
-                                            onCheckedChange={(checked) =>
-                                                toggleEquityGroup(
-                                                    group,
-                                                    !!checked,
-                                                )
-                                            }
-                                        />
-                                        <FieldLabel
-                                            htmlFor={`equity_${group}`}
-                                            className="cursor-pointer font-normal"
-                                        >
-                                            {group}
-                                        </FieldLabel>
-                                    </div>
+                                        key={category.code}
+                                        onClick={(e) => {
+                                            const target =
+                                                e.target as HTMLElement;
 
-                                    {isChecked &&
-                                        group === SOLO_PARENT_CHILD_GROUP && (
+                                            if (
+                                                target.closest(
+                                                    '[data-checkbox-toggle]',
+                                                ) ||
+                                                target.closest(
+                                                    '[data-stop-card-toggle]',
+                                                )
+                                            ) {
+                                                return;
+                                            }
+
+                                            toggleEquityGroup(
+                                                category,
+                                                !isChecked,
+                                            );
+                                        }}
+                                        className={`cursor-pointer space-y-3 rounded-lg border p-4 transition-all ${
+                                            isChecked
+                                                ? 'border-primary bg-primary/5'
+                                                : 'border-border'
+                                        }`}
+                                    >
+                                        <div
+                                            data-checkbox-toggle
+                                            className="flex items-start gap-3"
+                                        >
+                                            <Checkbox
+                                                id={`equity_${category.code}`}
+                                                checked={isChecked}
+                                                onCheckedChange={(checked) =>
+                                                    toggleEquityGroup(
+                                                        category,
+                                                        !!checked,
+                                                    )
+                                                }
+                                            />
+                                            <div>
+                                                <FieldLabel
+                                                    htmlFor={`equity_${category.code}`}
+                                                    className="cursor-pointer font-normal"
+                                                >
+                                                    {category.name}
+                                                </FieldLabel>
+                                                {category.desc && (
+                                                    <FieldDescription>
+                                                        {category.desc}
+                                                    </FieldDescription>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {isChecked &&
+                                            category.with_id === 1 && (
+                                                <div
+                                                    data-stop-card-toggle
+                                                    onClick={(e) =>
+                                                        e.stopPropagation()
+                                                    }
+                                                >
+                                                    <Field>
+                                                        <FieldLabel
+                                                            htmlFor={
+                                                                hasIndex
+                                                                    ? idKey
+                                                                    : undefined
+                                                            }
+                                                        >
+                                                            ID Number{' '}
+                                                            <Asterisk
+                                                                size={15}
+                                                                color="red"
+                                                            />
+                                                        </FieldLabel>
+                                                        <Input
+                                                            id={
+                                                                hasIndex
+                                                                    ? idKey
+                                                                    : undefined
+                                                            }
+                                                            value={
+                                                                entry?.id_number ??
+                                                                ''
+                                                            }
+                                                            onChange={(e) =>
+                                                                updateEquityGroupIdNumber(
+                                                                    category.code,
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                            aria-invalid={
+                                                                hasIndex &&
+                                                                !!formErrors[
+                                                                    idKey
+                                                                ]
+                                                            }
+                                                            placeholder="Enter ID number"
+                                                        />
+                                                        {hasIndex &&
+                                                            formErrors[
+                                                                idKey
+                                                            ] && (
+                                                                <FieldError>
+                                                                    {
+                                                                        formErrors[
+                                                                            idKey
+                                                                        ]
+                                                                    }
+                                                                </FieldError>
+                                                            )}
+                                                    </Field>
+                                                </div>
+                                            )}
+
+                                        {isChecked && (
                                             <div
                                                 data-stop-card-toggle
+                                                className="space-y-3"
                                                 onClick={(e) =>
                                                     e.stopPropagation()
                                                 }
@@ -3277,122 +3583,138 @@ export default function Index() {
                                                     <FieldLabel
                                                         htmlFor={
                                                             hasIndex
-                                                                ? `equity_groups.${submittedIndex}.equity_group`
+                                                                ? proofKey
                                                                 : undefined
                                                         }
                                                     >
-                                                        Living with
+                                                        Supporting Documents /
+                                                        Proof{' '}
+                                                        <Asterisk
+                                                            size={15}
+                                                            color="red"
+                                                        />
                                                     </FieldLabel>
-                                                    <Select
-                                                        value={
-                                                            entry?.living_with ??
-                                                            ''
+                                                    <Input
+                                                        type="file"
+                                                        multiple
+                                                        id={
+                                                            hasIndex
+                                                                ? proofKey
+                                                                : undefined
                                                         }
-                                                        onValueChange={(
-                                                            value,
-                                                        ) =>
-                                                            updateEquityGroupLivingWith(
-                                                                group,
-                                                                value,
+                                                        accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                                                        onChange={(e) => {
+                                                            addEquityGroupProofs(
+                                                                category.code,
+                                                                e.target.files,
+                                                            );
+                                                            // Allows selecting the same file again
+                                                            e.target.value = '';
+                                                        }}
+                                                        aria-invalid={
+                                                            hasIndex &&
+                                                            !!formErrors[
+                                                                proofKey
+                                                            ]
+                                                        }
+                                                    />
+                                                    <FieldDescription>
+                                                        Upload one or more
+                                                        images (JPG, JPEG, or
+                                                        PNG, max 5MB each).
+                                                    </FieldDescription>
+                                                    {hasIndex &&
+                                                        formErrors[
+                                                            proofKey
+                                                        ] && (
+                                                            <FieldError>
+                                                                {
+                                                                    formErrors[
+                                                                        proofKey
+                                                                    ]
+                                                                }
+                                                            </FieldError>
+                                                        )}
+                                                    {hasIndex &&
+                                                        Object.entries(
+                                                            formErrors,
+                                                        )
+                                                            .filter(([key]) =>
+                                                                key.startsWith(
+                                                                    `${proofKey}.`,
+                                                                ),
                                                             )
-                                                        }
-                                                    >
-                                                        <SelectTrigger
-                                                            id={
-                                                                hasIndex
-                                                                    ? `equity_groups.${submittedIndex}.equity_group`
-                                                                    : undefined
-                                                            }
-                                                        >
-                                                            <SelectValue placeholder="Choose an option" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectGroup>
-                                                                <SelectItem value="Mother">
-                                                                    Mother
-                                                                </SelectItem>
-                                                                <SelectItem value="Father">
-                                                                    Father
-                                                                </SelectItem>
-                                                            </SelectGroup>
-                                                        </SelectContent>
-                                                    </Select>
+                                                            .map(
+                                                                ([
+                                                                    key,
+                                                                    message,
+                                                                ]) => (
+                                                                    <FieldError
+                                                                        key={
+                                                                            key
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            message
+                                                                        }
+                                                                    </FieldError>
+                                                                ),
+                                                            )}
                                                 </Field>
+
+                                                {entry.proofs.length > 0 && (
+                                                    <div className="space-y-2">
+                                                        <p className="text-sm font-medium">
+                                                            Selected Files
+                                                        </p>
+                                                        {entry.proofs.map(
+                                                            (
+                                                                file,
+                                                                fileIndex,
+                                                            ) => (
+                                                                <div
+                                                                    key={`${file.name}-${fileIndex}`}
+                                                                    className="flex items-center justify-between rounded-md border bg-background p-2"
+                                                                >
+                                                                    <div className="flex min-w-0 items-center gap-2">
+                                                                        <ImagePlus className="size-4 shrink-0" />
+                                                                        <span className="truncate text-sm">
+                                                                            {
+                                                                                file.name
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() =>
+                                                                            removeEquityGroupProof(
+                                                                                category.code,
+                                                                                fileIndex,
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <X className="size-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
+                                    </div>
+                                );
+                            })}
 
-                                    {isChecked && (
-                                        <div
-                                            data-stop-card-toggle
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <Field>
-                                                <FieldLabel
-                                                    htmlFor={
-                                                        hasIndex
-                                                            ? `equity_groups.${submittedIndex}.proof`
-                                                            : undefined
-                                                    }
-                                                >
-                                                    Supporting Document / Proof{' '}
-                                                    <Asterisk
-                                                        size={15}
-                                                        color="red"
-                                                    />
-                                                </FieldLabel>
-                                                <Input
-                                                    type="file"
-                                                    id={
-                                                        hasIndex
-                                                            ? `equity_groups.${submittedIndex}.proof`
-                                                            : undefined
-                                                    }
-                                                    accept="image/jpeg,image/jpg,image/png"
-                                                    onChange={(e) =>
-                                                        updateEquityGroupProof(
-                                                            group,
-                                                            e.target
-                                                                .files?.[0] ??
-                                                                null,
-                                                        )
-                                                    }
-                                                    aria-invalid={
-                                                        hasIndex &&
-                                                        !!formErrors[
-                                                            `equity_groups.${submittedIndex}.proof`
-                                                        ]
-                                                    }
-                                                />
-                                                {entry?.proof && (
-                                                    <FieldDescription>
-                                                        Selected file:{' '}
-                                                        {entry.proof.name}
-                                                    </FieldDescription>
-                                                )}
-                                                {hasIndex &&
-                                                    formErrors[
-                                                        `equity_groups.${submittedIndex}.proof`
-                                                    ] && (
-                                                        <FieldError>
-                                                            {
-                                                                formErrors[
-                                                                    `equity_groups.${submittedIndex}.proof`
-                                                                ]
-                                                            }
-                                                        </FieldError>
-                                                    )}
-                                            </Field>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
+                            {errors.equity_groups && (
+                                <FieldError>{errors.equity_groups}</FieldError>
+                            )}
+                        </FieldGroup>
+                    </FieldSet>
+                )}
 
-                        {errors.equity_groups && (
-                            <FieldError>{errors.equity_groups}</FieldError>
-                        )}
-                    </FieldGroup>
-                </FieldSet>{' '}
                 <FieldSet>
                     <FieldLegend>V. Psychological Test Records</FieldLegend>
                     <FieldDescription>
@@ -3799,6 +4121,54 @@ export default function Index() {
                     )}
                 </div>
             </form>
+
+            <AlertDialog open={isUploadWarningOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 capitalize">
+                            <div className="flex size-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                                <TriangleAlert className="size-5" />
+                            </div>
+                            Important supporting document notice
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="mt-3">
+                            Upload only authentic documents that directly
+                            support your socioeconomic profile. Do not upload
+                            nude, sexually explicit, abusive, or otherwise
+                            inappropriate images, or documents belonging to
+                            another person. Uploaded files may be reviewed,
+                            recorded, and associated with your application for
+                            admission and data privacy compliance. False,
+                            misleading, inappropriate, or unauthorized
+                            submissions may result in disqualification from
+                            admission to the University and other appropriate
+                            action.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="flex items-center gap-2 pt-2">
+                        <Checkbox
+                            id="dont-show-again"
+                            checked={dontShowAgain}
+                            onCheckedChange={(checked) =>
+                                setDontShowAgain(!!checked)
+                            }
+                        />
+                        <Label
+                            htmlFor="dont-show-again"
+                            className="cursor-pointer text-sm font-normal text-muted-foreground"
+                        >
+                            Don't show this again
+                        </Label>
+                    </div>
+
+                    <AlertDialogFooter>
+                        <AlertDialogAction onClick={handleAcknowledgeWarning}>
+                            <CheckCheck /> I Understand and Agree
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

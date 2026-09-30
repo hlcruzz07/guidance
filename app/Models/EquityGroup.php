@@ -13,6 +13,11 @@ class EquityGroup extends Model
         'student_id',
         'equity_group',
         'proof',
+        'id_number',
+    ];
+
+    protected $casts = [
+        'proof' => 'array',
     ];
 
     public function student()

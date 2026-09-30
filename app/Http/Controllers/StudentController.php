@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\UploadFileToGoogleDriveJob;
-use App\Models\Student;
-use App\Services\ImageCompressionService;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreStudentRequest;
+use App\Jobs\UploadFileToGoogleDriveJob;
 use App\Models\EquityGroup;
+use App\Models\Student;
 use App\Repositories\StudentRepo;
+use App\Services\ImageCompressionService;
+use App\Services\OsisStudentLookup;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
+
 class StudentController extends Controller
 {
     public function __construct(
@@ -20,6 +24,7 @@ class StudentController extends Controller
         protected ImageCompressionService $imageCompressor,
     ) {
     }
+
     public function index()
     {
         $stats = [
@@ -33,17 +38,19 @@ class StudentController extends Controller
             'stats' => $stats,
         ]);
     }
+
     public function form(Request $request)
     {
         $data = $request->validate([
             'id_number' => 'required|string',
             'campus' => 'required|string',
             'birthdate' => 'required|date',
+            'email' => 'required|email',
         ]);
         $id_number = $data['id_number'];
         $campus = $data['campus'];
         $birthdate = $data['birthdate'];
-
+        $email = $data['email'];
         try {
             $connection = match (strtolower($campus)) {
                 'talisay' => 'tal_mysql',
@@ -107,10 +114,15 @@ class StudentController extends Controller
                 return redirect()->route('home')->with('error', 'Only students who are fully enrolled for the current school year (' . now()->year . ') can submit this form.');
             }
 
+            $osis = new OsisStudentLookup;
+            $osisStudent = $osis->findByEmail($email);
+
             return Inertia::render('student/index', [
                 'student' => array_merge((array) $student, [
                     'campus' => $campus,
+                    'osis' => $osisStudent,
                 ]),
+                "osis_socio_economic_categories" => $osis->getEconomicCategories()
             ]);
         } catch (\Throwable $th) {
             Log::error('Student lookup DB connection failed', [
@@ -121,7 +133,6 @@ class StudentController extends Controller
             return redirect()->route('home')->with('error', 'Database connection error. Please try again later.');
         }
     }
-
 
     public function store(StoreStudentRequest $request)
     {
@@ -167,26 +178,45 @@ class StudentController extends Controller
 
                 if (!empty($data['equity_groups'])) {
                     foreach ($data['equity_groups'] as $group) {
+                        // `proof` is now an array. Each item is either a freshly uploaded
+                        // file, or a Google Drive file ID already on file from OSIS.
+                        // Arr::wrap also covers a legacy single value.
+                        $items = Arr::wrap($group['proof'] ?? []);
 
+                        $newFiles = array_values(array_filter(
+                            $items,
+                            fn($item) => $item instanceof UploadedFile,
+                        ));
+
+                        $existingDriveIds = array_values(array_filter(
+                            $items,
+                            fn($item) => is_string($item) && $item !== '',
+                        ));
+
+                        // Start with any Drive IDs we already have. New uploads get
+                        // appended by the queued job once they land on Drive.
                         $equityGroup = $student->equityGroups()->create([
                             'equity_group' => $group['equity_group'],
-                            'proof' => null,
+                            'id_number' => $group['id_number'] ?? null,
+                            'proof' => $existingDriveIds,
                         ]);
 
-                        $proofFile = $group['proof'];
-                        $proofFilename = Str::random(40) . '.' . $proofFile->getClientOriginalExtension();
-                        $proofFile->move($tempDir, $proofFilename);
+                        foreach ($newFiles as $proof) {
+                            $proofFilename = Str::random(40) . '.' . $proof->getClientOriginalExtension();
+                            $proof->move($tempDir, $proofFilename);
 
-                        $proofPath = $tempDir . DIRECTORY_SEPARATOR . $proofFilename;
-                        $this->imageCompressor->compress($proofPath);
+                            $proofPath = $tempDir . DIRECTORY_SEPARATOR . $proofFilename;
+                            $this->imageCompressor->compress($proofPath);
 
-                        $uploads[] = [
-                            'model' => EquityGroup::class,
-                            'id' => $equityGroup->id,
-                            'field' => 'proof',
-                            'path' => $proofPath,
-                            'filename' => $proofFile->getClientOriginalName(),
-                        ];
+                            $uploads[] = [
+                                'model' => EquityGroup::class,
+                                'id' => $equityGroup->id,
+                                'field' => 'proof',
+                                'append' => true, // proof is an array: push the Drive ID, don't overwrite
+                                'path' => $proofPath,
+                                'filename' => $proof->getClientOriginalName(),
+                            ];
+                        }
                     }
                 }
 
@@ -233,7 +263,6 @@ class StudentController extends Controller
 
         return back()->with('success', 'Remarks updated successfully');
     }
-
 
     /**
      * Display the specified resource.

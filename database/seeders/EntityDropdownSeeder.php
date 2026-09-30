@@ -12,10 +12,11 @@ class EntityDropdownSeeder extends Seeder
         $dropdowns = [
 
             'Student Type' => [
-                'Freshmen',
-                'Shiftee',
+                'Regular',
                 'Transferee',
                 'Returnee',
+                'Shiftee',
+                'Returnee-Shiftee',
             ],
 
             'Equity Groups' => [

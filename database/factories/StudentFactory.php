@@ -31,7 +31,7 @@ class StudentFactory extends Factory
         $incomes = ['Less than Php 13,873 - 36,400', 'Php 36,401 - 63,700', 'Php 63,701 - 109,200', 'Php 109,201 - 182,000', 'Above Php 182,001'];
         $maritalStatuses = ['Married And Living Together', 'Single Parent', 'Annulled', 'Married But Separated', 'Not Married But Living Together', 'Others'];
         $relationships = ['Father', 'Mother', 'Parent', 'Legal Guardian', 'Spouse', 'Sibling', 'Grandparent', 'Aunt', 'Uncle', 'Relative', 'Friend'];
-        $types = [StudentType::FRESHMEN, StudentType::TRANSFEREE, StudentType::SHIFTEE, StudentType::RETURNEE];
+        $types = [StudentType::REGULAR, StudentType::TRANSFEREE, StudentType::SHIFTEE, StudentType::RETURNEE, StudentType::RETURNEE_SHIFTEE];
         $remarkBy = $this->faker->optional()->numberBetween(User::min('id'), User::max('id'));
 
         return [
@@ -42,8 +42,8 @@ class StudentFactory extends Factory
             'mname' => $this->faker->optional(0.8)->lastName(),
             'lname' => $this->faker->lastName(),
             'suffix' => $this->faker->optional(0.05)->randomElement(['Jr', 'Sr', 'II', 'III', 'IV', 'V']),
-            'email' => $this->faker->unique()->regexify('[a-z0-9]{10,14}').'@'.$this->faker->safeEmailDomain(),
-            'phone' => '9'.$this->faker->numerify('#########'),
+            'email' => $this->faker->unique()->regexify('[a-z0-9]{10,14}') . '@' . $this->faker->safeEmailDomain(),
+            'phone' => '9' . $this->faker->numerify('#########'),
             'type' => $this->faker->randomElement($types),
             'course' => $this->faker->randomElement($courses),
             'year_level' => (string) $yearLevel,
@@ -55,9 +55,9 @@ class StudentFactory extends Factory
             'weight' => (string) $this->faker->randomFloat(2, 40, 100),
             'religion' => $this->faker->randomElement($religions),
             'date_of_birth' => $this->faker->dateTimeBetween('-30 years', '-16 years')->format('Y-m-d'),
-            'place_of_birth' => $this->faker->city().', '.$this->faker->country(),
+            'place_of_birth' => $this->faker->city() . ', ' . $this->faker->country(),
             'nationality' => $this->faker->optional(0.9)->randomElement(['Filipino', 'American', 'Japanese', 'Korean', 'Chinese']),
-            'last_school_attended' => $this->faker->optional(0.9)->company().' '.$this->faker->randomElement(['High School', 'College', 'Academy']),
+            'last_school_attended' => $this->faker->optional(0.9)->company() . ' ' . $this->faker->randomElement(['High School', 'College', 'Academy']),
             'general_average' => $this->faker->optional(0.8)->randomFloat(2, 75, 99),
             'strand_course' => $this->faker->optional(0.7)->randomElement($strands),
             'scholarship' => $this->faker->optional(0.3)->randomElement(['CHED', 'DOST', 'Local Government', 'Institutional', 'Private']),
@@ -71,7 +71,7 @@ class StudentFactory extends Factory
             'current_address' => $this->faker->address(),
             'contact_person' => $this->faker->name(),
             'contact_person_address' => $this->faker->address(),
-            'contact_person_mobile_um' => '09'.$this->faker->numerify('#########'),
+            'contact_person_mobile_um' => '09' . $this->faker->numerify('#########'),
             'contact_person_relationship' => $this->faker->randomElement($relationships),
             'remark_by' => $remarkBy,
             'remarks' => $remarkBy
